@@ -1,0 +1,10 @@
+---
+name: ipsec
+
+templates:
+  psk.txt.erb: etc/psk.txt
+  racoon.conf.erb: etc/racoon.conf
+  racoon: bin/racoon
+
+packages:
+  - ipsec-tools-0.8.0

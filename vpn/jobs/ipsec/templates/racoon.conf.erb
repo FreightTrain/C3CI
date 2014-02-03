@@ -1,0 +1,61 @@
+#
+# NOTE: This file will not be used if you use racoon-tool(8) to manage your
+# IPsec connections. racoon-tool will process racoon-tool.conf(5) and
+# generate a configuration (/var/lib/racoon/racoon.conf) and use it, instead
+# of this file.
+#
+# Simple racoon.conf
+# 
+#
+# Please look in /usr/share/doc/racoon/examples for
+# examples that come with the source.
+#
+# Please read racoon.conf(5) for details, and alsoread setkey(8).
+#
+#
+# Also read the Linux IPSEC Howto up at 
+# http://www.ipsec-howto.org/t1.html 
+#
+log notify;
+path pre_shared_key "/var/vcap/jobs/ipsec/etc/psk.txt";
+path certificate "/var/vcap/jobs/ipsec/etc/certs";
+path pidfile "/var/vcap/sys/run/ipsec/racoon.pid";
+
+## 
+remote anonymous {
+
+	passive <%= properties.ipsec.passive %>;
+        my_identifier fqdn "<%= properties.ipsec.local_id %>";
+
+	# fixed settings
+        exchange_mode aggressive;
+        nat_traversal force;
+        ike_frag on;
+	lifetime time 12 hours;
+        generate_policy unique;
+	dpd_delay 30;
+        mode_cfg on;
+        proposal_check claim;
+        proposal {
+                encryption_algorithm aes;
+                hash_algorithm sha1;
+                authentication_method xauth_psk_server;
+                dh_group 2;
+        }
+}
+
+mode_cfg {
+  network4 <%= properties.ipsec.pool_1st_ip %>;
+  netmask4 <%= properties.ipsec.pool_netmask %>;
+  pool_size <%= properties.ipsec.pool_size %>;
+  split_network include <%= properties.ipsec.local_net %>;
+  dns4 <%= properties.ipsec.pool_dns %>;
+}
+
+sainfo anonymous {
+        encryption_algorithm aes;
+        authentication_algorithm hmac_sha1;
+        compression_algorithm deflate;
+        lifetime time 8 hours;
+}
+
