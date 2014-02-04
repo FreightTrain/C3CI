@@ -1,0 +1,6 @@
+---
+name: libfontconfig
+dependencies:
+- libfreetype
+files:
+  - libfontconfig/fontconfig-2.11.0.tar.gz

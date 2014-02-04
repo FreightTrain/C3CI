@@ -1,0 +1,4 @@
+---
+name: libfreetype
+files:
+  - libfreetype/freetype-2.5.0.1.tar.gz

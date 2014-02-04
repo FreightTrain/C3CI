@@ -1,0 +1,30 @@
+# abort script on any command that exits with a non zero value
+set -e
+
+RUBY_VERSION=2.0.0-p353
+RUBYGEMS_VERSION=2.0.7
+CORES=`grep -c "^processor" /proc/cpuinfo`
+
+tar xzf ruby/ruby-${RUBY_VERSION}.tar.gz
+(
+  set -e
+  cd ruby-${RUBY_VERSION}
+  ./configure --prefix=${BOSH_INSTALL_TARGET} --disable-install-doc
+  make -j${CORES}
+  make install
+)
+
+tar zxvf ruby/rubygems-${RUBYGEMS_VERSION}.tgz
+(
+  set -e
+  cd rubygems-${RUBYGEMS_VERSION}
+
+  ${BOSH_INSTALL_TARGET}/bin/ruby setup.rb
+
+  if [[ $? != 0 ]] ; then
+    echo "Cannot install rubygems"
+    exit 1
+  fi
+)
+
+${BOSH_INSTALL_TARGET}/bin/gem install ruby/bundler-1.3.5.gem --no-ri --no-rdoc

@@ -1,0 +1,61 @@
+---
+sqlite/sqlite-autoconf-3070500.tar.gz:
+  object_id: 13aa3e7d-ef0a-420d-b6e0-273c3feb0c16
+  sha: 4e1338497b8da50b84307191bb3418e9ec5715d7
+  size: 1551070
+git/git-1.7.11.2.tar.gz:
+  object_id: db2300d1-6458-469c-a675-51ff2e795477
+  sha: f67b4f6c0277250411c6872ae7b8a872ae11d313
+  size: 4015780
+java/jre-1.6.0_24-x86_64.tar.gz:
+  object_id: c32f81e8-f3da-43fb-b75f-1292610ccb5a
+  sha: 0511d833dfd9825a26c18e9d685de64ac0151e85
+  size: 34453414
+nginx/nginx-1.4.2.tar.gz:
+  object_id: b6b04861-b8ad-459e-a687-2d9dcbaca378
+  sha: 8f006dc773840b6624a137a584ff8850d5155e3f
+  size: 767688
+nginx/pcre-8.33.tar.gz:
+  object_id: 44d48935-af07-4e40-95e9-7825834dc127
+  sha: bceafb53553219dad2593bb8af06da4d07fd3828
+  size: 1889401
+jenkins/jenkins-1.509.2.war:
+  object_id: 1b99c40b-7300-4bf4-87df-ee7f139e57ba
+  sha: 7d595ddd857f999b770b0ec02b9b0e88c0b2e17a
+  size: 53863401
+ruby/bundler-1.3.5.gem:
+  object_id: 0eb84f24-d16f-42a3-9c89-d009ba4d5e38
+  sha: 2cad3052a59b83f1f616e8202f5c714e46bd8523
+  size: 268800
+ruby/ruby-2.0.0-p247.tar.gz:
+  object_id: 535ce44f-124a-4f31-93f5-d0546a9fb8b1
+  sha: 850b93afb5914ee3f38f0769e309abf0cedf084b
+  size: 13652782
+ruby/rubygems-2.0.7.tgz:
+  object_id: 9b60d269-f9da-40dd-aea4-e673dda26f36
+  sha: f0b0a03d573e21125ba5da1db14461d6a99340d4
+  size: 337146
+ruby/ruby-2.0.0-p353.tar.gz:
+  object_id: 72e8d4ea-684e-4970-a25d-45b69c4ba7c2
+  sha: 7f2c8b8f5682aabc1114f44d36d314c6c37c11b8
+  size: 13572794
+java/jdk1.7.0_45.gz:
+  object_id: 37203825-1cda-472b-81d6-55171cfa7355
+  sha: 1c8cb229e2f7f0a3e5e798a3008c5a1f7c604934
+  size: 138094686
+libfontconfig/fontconfig-2.11.0.tar.gz:
+  object_id: 8c9ab4a6-86e7-4a0a-8aab-b1bf8c77c023
+  sha: 650f8f3b8c7b6fac68c25f379616b5be48be13bf
+  size: 1844487
+libfreetype/freetype-2.5.0.1.tar.gz:
+  object_id: b8f12bb1-c86c-49af-8f32-154e32698311
+  sha: 2d539b375688466a8e7dcc4260ab21003faab08c
+  size: 2113872
+libyaml/yaml-0.1.4.tar.gz:
+  object_id: 861fbb74-18c5-424f-8bd5-dfed165007af
+  sha: e0e5e09192ab10a607e3da2970db492118f560f2
+  size: 471759
+phantomjs/phantomjs-1.9.2-linux-x86_64.tar.bz2:
+  object_id: f01bf208-ca26-484c-8023-7b75a6017cfa
+  sha: c78c4037d98fa893e66fc516214499c58228d2f9
+  size: 13279068
