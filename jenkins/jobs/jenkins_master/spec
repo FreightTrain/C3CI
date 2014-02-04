@@ -31,6 +31,8 @@ templates:
   config/jenkins_plugins.conf.erb: config/jenkins_plugins.conf
   config/hudson.plugins.s3.S3BucketPublisher.xml.erb: config/hudson.plugins.s3.S3BucketPublisher.xml
 
+  jenkins_jobs/deploy-cf.xml: jenkins_jobs/deploy-cf.xml
+
 properties:
   jenkins.admin.password:
     description: Admin user password
