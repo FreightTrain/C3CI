@@ -49,11 +49,14 @@ module BoshMediator
     private
 
     def stemcell_download_dir
-      Pathname.new(if ENV['STEMCELL_DOWNLOAD_DIR']
-        ENV['STEMCELL_DOWNLOAD_DIR']
+      if ENV['STEMCELL_DOWNLOAD_DIR']
+        dir = ENV['STEMCELL_DOWNLOAD_DIR']
       else
-        Dir.tmpdir
-      end)
+        puts "Set STEMCELL_DOWNLOAD_DIR for repeatable caching"
+        dir = Dir.tmpdir
+      end
+
+      Pathname.new(dir)
     end
 
     def download_url(download_url, download_path, headers = {})
