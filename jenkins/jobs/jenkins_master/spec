@@ -55,3 +55,5 @@ properties:
     description: Amazon API secret key
   amazon.encrypted_secretkey:
     description: Amazon API secret key - obfuscated by Jenkins for storage
+  bosh.micro_ip:
+    description: BOSH micro for use by jenkins jobs
