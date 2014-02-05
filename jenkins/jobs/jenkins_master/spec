@@ -32,6 +32,7 @@ templates:
   config/hudson.plugins.s3.S3BucketPublisher.xml.erb: config/hudson.plugins.s3.S3BucketPublisher.xml
 
   jenkins_jobs/deploy-cf.xml: jenkins_jobs/deploy-cf.xml
+  jenkins_jobs/test-cf.xml: jenkins_jobs/test-cf.xml
 
 properties:
   jenkins.admin.password:
