@@ -1,0 +1,101 @@
+name: bosh-vpn
+director_uuid: CCC20C06-6209-43CD-A664-2C065CBDDF1D
+
+release:
+  name: vpn
+  version: latest
+
+compilation:
+  workers: 1
+  reuse_compilation_vms: true
+  network: default
+  cloud_properties:
+   instance_type: m1.small
+
+update:
+  canaries: 1
+  canary_watch_time: 3000-90000
+  update_watch_time: 3000-90000
+  max_in_flight: 1
+  max_errors: 1
+
+networks:
+- name: default
+  type: manual
+  subnets:
+  - reserved:
+    - 10.0.0.2 - 10.0.0.9
+    static:
+    - 10.0.0.15
+    range: 10.0.0.0/24
+    gateway: 10.0.0.1
+    dns:
+    - 10.0.0.2
+    cloud_properties:
+      subnet: subnet-3cf9dc7a
+      security_groups:
+      - bosh
+
+- name: vip_network
+  type: vip
+  # Fake network properties to satisfy bosh diff
+  cloud_properties:
+    security_groups:
+    - bosh
+
+resource_pools:
+
+- name: infrastructure
+  network: default
+  size: 1
+  stemcell:
+    name: bosh-aws-xen-ubuntu
+    version: latest
+  cloud_properties:
+   instance_type: m1.small
+
+
+jobs:
+
+- name: ipsec
+  template: ipsec
+  instances: 1
+  resource_pool: infrastructure
+  persistent_disk: 3000
+  networks:
+  - name: default
+    default:
+    - dns
+    - gateway
+    static_ips:
+     - 10.0.0.15
+  - name: vip_network
+    static_ips:
+     - 1.2.3.4
+
+properties:
+
+  ipsec:
+   # Ipsec ID of this system
+   local_id: "vpn-server"
+   # Ipsec group ID expected to be sent by client
+   remote_id: "my-secet-group-id"
+   # Preshared key for above group ID
+   psk: "my_super_secret_pwd"
+   # My local subnet I'm routing traffic to
+   local_net: "10.0.0.0/17"
+   # Do I wait for connection, or dial the other side?
+   passive: "on"
+   # First pool network address to give out
+   pool_1st_ip: "192.168.0.1"
+   # Netmask for VPN pool
+   pool_netmask: "255.255.255.0"
+   # Number of pool ip's to give out
+   pool_size: "10"
+   # Pool DNS server
+   pool_dns: "10.0.0.10"
+
+  networks:
+    apps: default
+    management: default
+
