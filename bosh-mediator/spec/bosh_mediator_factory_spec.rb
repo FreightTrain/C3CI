@@ -9,12 +9,12 @@ module BoshMediator
     describe '#create_bosh_mediator' do
       it 'can be instantiated with a URI, credentials, release manifest and release directory' do
         mediator = bmf.create_bosh_mediator(
-          'http://localhost:25555', 'username', 'password', 'foo', assets_dir)
+          'http://localhost:25555', 'username', 'password', assets_dir)
         expect(mediator).to respond_to(:deploy)
       end
       it 'raises if the release directory does not exist' do
         expect do
-          bmf.create_bosh_mediator('http://localhost:25555', 'username', 'password', 'foo', '/does-not-exist')
+          bmf.create_bosh_mediator('http://localhost:25555', 'username', 'password', '/does-not-exist')
         end.to raise_error(ArgumentError, 'Release directory does not exist: /does-not-exist')
       end
     end

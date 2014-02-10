@@ -58,20 +58,8 @@ module BoshMediator
       metadata
     end
 
-    def set_manifest_stemcell_and_version(stemcell_name_and_version, release_file)
-      unless [:name, :version].all?{|k| stemcell_name_and_version[k]}
-        raise 'The provided stemcell name and version was malformed'
-      end
-      unless File.exists? release_file
-        raise "The provided release manifest - #{release_file} - does not exist"
-      end
-      sc_name = stemcell_name_and_version[:name]
-      sc_version = stemcell_name_and_version[:version]
-      eruby = Erubis::Eruby.new(File.read(release_file), :pattern=>'<!--% %-->')
-      File.open(release_file, 'w') do |f|
-        f.write(eruby.result('stemcell_name' => sc_name,
-          'stemcell_version' => sc_version))
-      end
+    def set_manifest_file(manifest_file)
+      @deployment_command.options.merge(:config => manifest_file, :deployment => manifest_file)
     end
 
     def self.raise_on_error!(bosh_cmd)

@@ -4,16 +4,14 @@ require_relative 'bosh_mediator'
 module BoshMediator
   module BoshMediatorFactory
 
-    def create_bosh_mediator(bosh_director_uri, username, password, manifest_file, release_dir)
+    def create_bosh_mediator(bosh_director_uri, username, password, release_dir)
       cd_to_release_dir!(release_dir)
       bosh_director = Bosh::Cli::Client::Director.new(bosh_director_uri, username, password)
 
       deployment_command = Bosh::Cli::Command::Deployment.new
-      deployment_command.options = {:config => manifest_file,
-                                    :target => bosh_director_uri,
+      deployment_command.options = {:target => bosh_director_uri,
                                     :username => username,
                                     :password => password,
-                                    :deployment => manifest_file,
                                     :non_interactive => true,
                                     :force => true}
 
