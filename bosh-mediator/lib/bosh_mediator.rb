@@ -59,7 +59,7 @@ module BoshMediator
     end
 
     def set_manifest_file(manifest_file)
-      @deployment_command.options.merge(:config => manifest_file, :deployment => manifest_file)
+      @deployment_command.options.merge!(:config => manifest_file, :deployment => manifest_file)
     end
 
     def self.raise_on_error!(bosh_cmd)
