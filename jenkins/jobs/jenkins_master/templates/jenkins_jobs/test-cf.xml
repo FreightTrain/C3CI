@@ -36,8 +36,6 @@
     <hudson.tasks.Shell>
       <command>#!bash -ex
 
-export PATH=$PATH:/var/vcap/packages/ruby/bin
-
 RUBY_VERSION=$(ruby -v | awk &apos;{print $2}&apos;)
 export GEM_HOME=/var/vcap/store/gems/$RUBY_VERSION/$JOB_NAME
 export GEM_PATH=$GEM_HOME

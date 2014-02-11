@@ -47,5 +47,11 @@ while true
         aptitude update
         aptitude install -y graphviz
     fi
+    if  dpkg -s bzr > /dev/null
+      then true
+      else
+        aptitude update
+        aptitude install -y bzr
+    fi
   sleep 60
   done

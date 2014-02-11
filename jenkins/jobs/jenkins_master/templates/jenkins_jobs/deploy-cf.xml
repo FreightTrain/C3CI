@@ -13,13 +13,18 @@
         </hudson.model.StringParameterDefinition>
         <hudson.model.StringParameterDefinition>
           <name>CF_MANIFEST</name>
-          <description>CF manifest name - eg. cf_ci.yml</description>
-          <defaultValue>cf_ci.yml</defaultValue>
+          <description>CF manifest name - eg. cf_ci_core.yml</description>
+          <defaultValue>cf_ci_core.yml</defaultValue>
         </hudson.model.StringParameterDefinition>
         <hudson.model.StringParameterDefinition>
           <name>STEMCELL_NAME</name>
           <description>Stemcell name - from official s3 buckets - eg. bosh-stemcell-1868-aws-xen-ubuntu.tgz</description>
           <defaultValue>bosh-stemcell-1868-aws-xen-ubuntu.tgz</defaultValue>
+        </hudson.model.StringParameterDefinition>
+        <hudson.model.StringParameterDefinition>
+          <name>SPIFF_DIR</name>
+          <description>Directory of files to merge with manifest, using spiff</description>
+          <defaultValue>aws</defaultValue>
         </hudson.model.StringParameterDefinition>
       </parameterDefinitions>
     </hudson.model.ParametersDefinitionProperty>
@@ -54,7 +59,7 @@
   <concurrentBuild>false</concurrentBuild>
   <builders>
     <hudson.tasks.Shell>
-      <command>export PATH=$PATH:/var/vcap/packages/ruby/bin
+      <command>
 
 RUBY_VERSION=$(ruby -v | awk &apos;{print $2}&apos;)
 export GEM_HOME=/var/vcap/store/gems/$RUBY_VERSION/$JOB_NAME
@@ -68,12 +73,14 @@ gem install bundler -v 1.3.5
 cd C3CI
 bundle
 bundle exec rake cf:upload_and_deploy_release[\
-`pwd`/cf-release/releases/${CF_RELEASE},\
+`pwd`/cf-release/releases/cf-154.yml,\
 `pwd`/../cf/${CF_MANIFEST},\
 https://${BOSH_MICRO_IP}:25555,\
-`pwd`/cf-release/,\
-http://bosh-jenkins-artifacts.s3.amazonaws.com/bosh-stemcell/aws/${STEMCELL_NAME}\
+`pwd`/cf-release,\
+http://bosh-jenkins-artifacts.s3.amazonaws.com/bosh-stemcell/aws/${STEMCELL_NAME},\
+`pwd`/../cf/aws\
 ]
+
 )
 </command>
     </hudson.tasks.Shell>
