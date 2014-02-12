@@ -41,8 +41,8 @@ module BoshMediator
           @manifest_writer = ManifestWriter.new(test_manifest, {name: s_name, version: s_version}, nil)
           new_manifest_path = @manifest_writer.parse_and_merge_file
           manifest_contents = File.read(new_manifest_path)
-
-          stemcell_vars = Hash[manifest_contents.scan(/.*stemcell:\n\s+name: (.*)\n\s+version: (.*)\n/)]
+          require 'pry' ; binding.pry
+          stemcell_vars = Hash[manifest_contents.scan(/.*stemcells:\n\s+stemcell_name: (.*)\n\s+stemcell_version: (.*)\n/)]
           expect(stemcell_vars).to eq({s_name => s_version})
         ensure
           File.delete(test_manifest) if File.exists? test_manifest

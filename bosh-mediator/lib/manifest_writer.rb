@@ -47,12 +47,10 @@ module BoshMediator
       puts "*** - on template manifest #{@manifest_file} ***"
 
       eruby = Erubis::Eruby.new(File.read(@manifest_file), :pattern=>'<!--% %-->')
-      Erubis::Eruby.new(
-        eruby.result(
-          'stemcell_name' => sc_name,
-          'stemcell_version' => sc_version
-        )
-      ).result
+      eruby.result(
+        'stemcell_name' => sc_name,
+        'stemcell_version' => sc_version
+      )
     end
 
     def spiff_merge(erb_output_manifest, output_manifest)

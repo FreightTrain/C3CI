@@ -1,258 +1,448 @@
 ---
-<%
-director_uuid = "4850c5e0-2fd5-4139-b2c9-9bd0a36e5585"
-protocol = "http"
-cf_release = "latest"
-ip_address = "1.2.3.11"
-common_password = "admin"
-root_domain = "admin.local"
-deployment_name = "cf-demo"
-stemcell_name = '<!--%= stemcell_name %-->'
-stemcell_version = '<!--%= stemcell_version %-->'
-%>
-name: <%= deployment_name %>
-director_uuid: <%= director_uuid %>
+name: (( meta.name ))
+director_uuid: (( meta.director_uuid ))
 
+meta:
+  (( merge ))
+
+stemcells:
+  stemcell_name: <!--%= stemcell_name %-->
+  stemcell_version: <!--%= stemcell_version %-->
+
+# RELEASES
+#===========================================================================
 releases:
- - name: cf
-   version: <%= cf_release %>
+- name: cf
+  version: (( meta.cf_release ))
+- name: admin-ui
+  version: (( meta.admin_ui_release ))
 
+# COMPILATION
+#===========================================================================
 compilation:
-  workers: 1
-  network: default
+  workers: 5
+  network: internalPAAS
   reuse_compilation_vms: true
   cloud_properties:
-    ram: 2048
-    disk: 4096
-    cpu: 2
+    (( merge ))
 
 
+# UPDATE
+#===========================================================================
 update:
   canaries: 1
-  canary_watch_time: 30000-300000
-  update_watch_time: 30000-300000
+  canary_watch_time: 60000
+  update_watch_time: 60000
   max_in_flight: 4
+  max_errors: 1
 
+# NETWORKS
+#===========================================================================
 networks:
-  - name: default
-    subnets:
-    - reserved:
-      - 1.2.3.1 - 1.2.3.9
-      - 1.2.3.10
-      - 1.2.3.19 - 1.2.3.252
-      - 1.2.3.254
-      static:
-      - <%= ip_address %>
-      range: 1.2.3.0/24
-      gateway: 1.2.3.253
-      dns:
-      - 1.2.3.2
-      cloud_properties:
-        name: 'VM Network'
+  (( merge ))
 
+
+# RESOURCE POOLS
+#===========================================================================
 resource_pools:
-- name: common
-  network: default
-  size: 4
+
+- name: infrastructure
+  network: internalPAAS
+  size: (( auto )) 
   stemcell:
-    name: <%= stemcell_name %>
-    version: <%= stemcell_version %>
+    name: (( stemcells.stemcell_name ))
+    version: (( stemcells.stemcell_version ))
   cloud_properties:
-    ram: 1024
-    disk: 4000
-    cpu: 2
+    (( merge ))
 
-
-- name: large
-  network: default
-  size: 1
+- name: deas
+  network: internalPAAS
+  size: (( auto ))
   stemcell:
-    name: <%= stemcell_name %>
-    version: <%= stemcell_version %>
+    name: (( stemcells.stemcell_name ))
+    version: (( stemcells.stemcell_version ))
   cloud_properties:
-    ram: 2048
-    disk: 4000
-    cpu: 2
+    (( merge ))
 
 
+- name: proxies
+  network: internalPAAS
+  size: (( auto ))
+  stemcell:
+    name: (( stemcells.stemcell_name ))
+    version: (( stemcells.stemcell_version ))
+  cloud_properties:
+    (( merge ))
+
+
+# JOBS
+#===========================================================================
 jobs:
-  - name: core
-    template:
-      - nats
-      - uaa
-      - health_manager_next
-    instances: 1
-    resource_pool: large
-    networks:
-      - name: default
-        default: [dns, gateway]
 
-  - name: pgnfs
-    template:
-      - postgres
-      - debian_nfs_server
-    instances: 1
-    resource_pool: common
-    persistent_disk: 65536
-    networks:
-      - name: default
-        default: [dns, gateway]
-    properties:
-      db: databases
+# jobs.nats -----------------------------  
+- name: nats
+  release: cf
+  template: nats
+  instances: 1
+  resource_pool: infrastructure
+  networks:
+    (( merge ))
 
-  - name: cloud_controller
-    template:
-      - cloud_controller_ng
-    instances: 1
-    resource_pool: common
-    networks:
-      - name: default
-        default: [dns, gateway]
-    properties:
-      ccdb: ccdb
+# jobs.loggregator ---------------------------------  
+- name: loggregator
+  release: cf
+  template: loggregator
+  instances: 1
+  resource_pool: infrastructure
+  networks:
+    (( merge ))
 
-  - name: router
-    template:
-      - gorouter
-    instances: 1
-    resource_pool: common
-    networks:
-      - name: default
-        static_ips:
-          - <%= ip_address %>
+# jobs.loggregator_tc ---------------------------------  
 
-  - name: dea
-    template: dea_next
-    instances: 1
-    resource_pool: common
-    networks:
-      - name: default
-        default: [dns, gateway]
+- name: loggregator_tc
+  release: cf
+  template: loggregator_trafficcontroller
+  instances: 1
+  resource_pool: infrastructure
+  networks:
+    (( merge ))
 
+# jobs.router --------------------------  
+- name: router
+  release: cf
+  template: gorouter
+  instances: 1
+  resource_pool: infrastructure
+  networks:
+    (( merge ))
+
+# jobs.haproxy -----------------------------  
+- name: haproxy
+  release: cf
+  template: haproxy
+  instances: 1
+  resource_pool: proxies
+  networks:
+    (( merge ))
+
+# jobs.nfsserver -----------------------------  
+- name: nfs_server
+  release: cf
+  template: debian_nfs_server
+  instances: 1
+  resource_pool: infrastructure
+  persistent_disk: 8192
+  networks:
+    (( merge ))
+
+# jobs.ccdb_ng -----------------------------  
+- name: ccdb_ng
+  release: cf
+  template: postgres
+  instances: 1
+  resource_pool: infrastructure
+  persistent_disk: 2048
+  networks:
+    (( merge ))
+  properties:
+    db: ccdb_ng
+
+# jobs.uaadb -----------------------------  
+- name: uaadb
+  db_scheme: postgresql
+  release: cf
+  template: postgres
+  instances: 1
+  resource_pool: infrastructure
+  persistent_disk: 2048
+  networks:
+    (( merge ))
+  properties:
+    db: uaadb
+
+# jobs.uaa -----------------------------  
+- name: uaa
+  release: cf
+  template: uaa
+  instances: 1
+  resource_pool: infrastructure
+  networks:
+    (( merge ))
+
+
+# jobs.login ----------------------
+- name: login
+  release: cf
+  template: login
+  instances: 1
+  resource_pool: infrastructure
+  networks:
+    (( merge ))
+
+
+# jobs.cloud_controller_ng -----------------------------  
+- name: cloud_controller_ng
+  release: cf
+  template: cloud_controller_ng
+  instances: 1 
+  resource_pool: infrastructure
+  networks:
+    (( merge ))
+
+# jobs.health_manager_next --------------------------  
+- name: health_manager_next
+  release: cf
+  template: health_manager_next
+  instances: 1
+  resource_pool: infrastructure
+  networks:
+    (( merge ))
+
+# jobs.admin_ui ---------------------------------  
+- name: admin_ui
+  release: admin-ui
+  template: admin_ui
+  instances: 1
+  resource_pool: infrastructure
+  networks:
+    (( merge ))
+
+
+# jobs.dea_next -----------------------------  
+- name: dea_next
+  release: cf
+  template: 
+   - dea_next
+   - dea_logging_agent
+  instances: 1
+  resource_pool: deas
+  update:
+    max_in_flight: 1
+  networks:
+    (( merge ))
+  properties:
+    dea_next:
+      directory_server_protocol: https
+      stacks:
+      - lucid64
+
+
+# PROPERTIES
+#=========================================================================== 
 properties:
-  domain: <%= root_domain %>
-  system_domain: <%= root_domain %>
-  system_domain_organization: "demo"
+  domain: (( meta.root_domain ))  
+  # https://github.com/cloudfoundry/cf-release/blob/master/jobs/cloud_controller_ng/templates/cloud_controller_ng.yml.erb:12
+  system_domain: (( meta.root_domain ))
+  system_domain_organization: "(( merge || demo ))"
   app_domains:
-    - <%= root_domain %>
-  support_address: http://support.<%= root_domain %>
-  description: "Cloud Foundry v2 sponsored by Pivotal"
+   - (( meta.root_domain ))
+
+# ----------------------------------------------------------------------------------------------
+# properties.login
+# See: https://github.com/cloudfoundry/cf-release/blob/master/jobs/login/templates/login.yml.erb
+# ----------------------------------------------------------------------------------------------
+  login:
+    protocol: http
+    enabled: true
+    links:
+      home:  http://login.ft3.cpgpaas.net
+      passwd: http://login.ft3.cpgpaas.net/password_resets/new
+      signup: https://signup.ft3.cpgpaas.net
 
   networks:
-    apps: default
-    management: default
+    apps: internalPAAS
+    management: internalPAAS
 
+# properties.nats -----------------------------  
   nats:
-    address: 0.core.default.<%= deployment_name %>.microbosh
-    port: 4222
+    machines:
+     - (( "0.nats.internalPAAS." meta.name ".microbosh" ))
+    address: (( "0.nats.internalPAAS." meta.name ".microbosh" )) # Leaving this here for per cf-138 compatibility
     user: nats
-    password: <%= common_password %>
-    authorization_timeout: 10
+    password: (( meta.common_password ))
+    port: 4222
+    authorization_timeout: 5
+    use_gnatsd: false
 
+
+# properties.ccdb -----------------------------  
+  ccdb: &ccdb
+    address: (( "0.ccdb-ng.internalPAAS." meta.name ".microbosh" ))
+    port: 2544
+    db_scheme: postgres # Ruby app so "postgres"
+    roles:
+    - tag: admin
+      name: admin
+      password: (( meta.common_password ))
+    databases:
+    - tag: cc
+      name: ccdb
+      citext: true
+
+  ccdb_ng: *ccdb
+
+# --------------------------------------------------------------------------------------------
+# properties.health_manager_ccng
+# https://github.com/cloudfoundry/cf-release/blob/master/jobs/health_manager_next/templates/health_manager_next.yml.erb
+# --------------------------------------------------------------------------------------------
+  health_manager_ccng:
+    shadow_mode: disable
+    cc_partition: ng
+
+# properties.uaadb.db_scheme
+# https://github.com/cloudfoundry/cf-release/blob/master/jobs/uaa/templates/uaa.yml.erb
+  uaadb:
+    db_scheme: postgresql # Java app so "postgresql"
+    address: (( "0.uaadb.internalPAAS." meta.name ".microbosh" ))
+    port: 2544
+    roles:
+    - tag: admin
+      name: root
+      password: (( meta.common_password ))
+    databases:
+    - tag: uaa
+      name: uaa
+
+# --------------------------------------------------------------------------------------------
+# properties.cc
+# https://github.com/cloudfoundry/cf-release/blob/master/jobs/cloud_controller_ng/spec
+# --------------------------------------------------------------------------------------------
+  cc: &cc 
+    port: 80
+    srv_api_uri: (( "https://api." meta.root_domain ))
+    external_host: api # This is the route the CCNG will register with the go router
+    logging_level: debug
+    bulk_api_password: (( meta.common_password ))
+    uaa_resource_id: cloud_controller
+    staging_upload_user: stagingupload
+    staging_upload_password: (( meta.common_password ))
+    db_encryption_key: (( meta.common_password ))
+    development_mode: false
+    disable_custom_buildpacks: false
+    default_quota_definition: paid
+    quota_definitions:
+      free:
+        non_basic_services_allowed: true
+        total_services: 10
+        total_routes: 1000
+        memory_limit: 10240 # 10 GB
+      paid:
+        non_basic_services_allowed: true
+        total_services: 20
+        total_routes: 1000
+        memory_limit: 102400 # 100 GB
+      runaway:
+        non_basic_services_allowed: true
+        total_services: 500
+        total_routes: 1000
+        memory_limit: 204800 # 200 GB
+
+  ccng: *cc
+
+# --------------------------------------------------------------------------------------------
+# properties.router
+# https://github.com/cloudfoundry/cf-release/blob/master/jobs/gorouter/spec
+# https://github.com/cloudfoundry/cf-release/blob/master/jobs/gorouter/templates/gorouter.yml.erb
+# --------------------------------------------------------------------------------------------
   router:
-    status:
+    port: 80
+    servers:         # Used for HAProxy
+      z1:            # Used for HAProxy
+        - (( "0.router.internalPAAS." meta.name ".microbosh" )) # Used for HAProxy
+      z2: []         # Used for HAProxy
+    status: # NOTE: Status listens ONLY on the defauly gateway IP of the router.
       port: 8080
-      user: gorouter
-      password: <%= common_password %>
+      user: router
+      password: (( meta.common_password ))
 
-  dea: &dea
-    memory_mb: 4096
+# --------------------------------------------------------------------------------------------
+# properties.haproxy
+# https://github.com/cloudfoundry/cf-release/blob/master/jobs/haproxy/spec
+# https://github.com/cloudfoundry/cf-release/blob/master/jobs/haproxy/templates/haproxy.config.erb
+#
+# NOTE: The extra blank lines in the cert are required!
+# --------------------------------------------------------------------------------------------
+  ha_proxy:
+    (( merge ))
+# --------------------------------------------------------------------------------------------
+# properties.loggregator
+# https://github.com/cloudfoundry/cf-release/blob/master/jobs/loggregator/spec
+# https://github.com/cloudfoundry/cf-release/blob/master/jobs/loggregator_trafficcontroller/spec
+# --------------------------------------------------------------------------------------------
+  loggregator:
+    debug: false
+    shared_secret: (( meta.common_password ))
+    incoming_port: 3456
+    maxRetainedLogMessages: 2000
+    outgoing_port: 8080
+    status: # /varz
+      port: 8081
+      user: loggregator
+      password: (( meta.common_password ))
+    servers:
+      z1:
+      - (( "0.loggregator.internalPAAS." meta.name ".microbosh" ))
+
+  traffic_controller:
+    host: (( "0.loggregator-tc.internalPAAS." meta.name ".microbosh" ))
+    debug: false
+    zone: z1
+    status: # /varz
+      port: 8081
+      user: trafficcontroller
+      password: (( meta.common_password ))
+
+  # The endpoint used by other jobs to point to the loggregator
+  # This should point to the Loggregator Traffic Controller
+  loggregator_endpoint:
+    shared_secret: (( meta.common_password ))  # The key used to sign log messages
+    host: (( "0.loggregator-tc.internalPAAS." meta.name ".microbosh" ))              # Used to emit messages to the Loggregator
+    port: 3456                    # Used to emit messages to the Loggregator
+
+  # SSL Properties for allowing loggregator with self signed demo certs
+  ssl:
+    skip_cert_verify: true
+
+# --------------------------------------------------------------------------------------------
+# properties.dea_next
+# https://github.com/cloudfoundry/cf-release/blob/master/jobs/dea_next/spec
+# --------------------------------------------------------------------------------------------
+  dea_next:
+    memory_mb: 102400
+    memory_overcommit_factor: 1
     disk_mb: 16384
-    directory_server_protocol: <%= protocol %>
-    mtu: 1454
+    disk_overcommit_factor: 4
+    num_instances: 256
 
-  dea_next: *dea
-
-  syslog_aggregator:
-    address: 0.syslog-aggregator.default.<%= deployment_name %>.microbosh
-    port: 54321
-
+# -----------------------------  
   nfs_server:
-    address: 0.pgnfs.default.<%= deployment_name %>.microbosh
-    network: "*.<%= deployment_name %>.microbosh"
-    idmapd_domain: dfw2
+    address: (( "0.nfs-server.internalPAAS." meta.name ".microbosh" ))
+    network: (( "*." meta.name ".microbosh" ))
 
   debian_nfs_server:
     no_root_squash: true
 
-  databases: &databases
-    db_scheme: postgres
-    address: 0.pgnfs.default.<%= deployment_name %>.microbosh
-    port: 5524
-    roles:
-      - tag: admin
-        name: ccadmin
-        password: <%= common_password %>
-      - tag: admin
-        name: uaaadmin
-        password: <%= common_password %>
-    databases:
-      - tag: cc
-        name: ccdb
-        citext: true
-      - tag: uaa
-        name: uaadb
-        citext: true
+# --------------------------------------------------------------------------------------------
+# properties.syslog_aggregator
+# https://github.com/cloudfoundry/cf-release/blob/master/jobs/syslog_aggregator/spec
+# --------------------------------------------------------------------------------------------
+  syslog_aggregator:
+    address: logger.monitoring.cpgpaas.net
+    port: 514
+    #address: 9.10.5.107
+    #port: 54321
 
-  ccdb: &ccdb
-    db_scheme: postgres
-    address: 0.pgnfs.default.<%= deployment_name %>.microbosh
-    port: 5524
-    roles:
-      - tag: admin
-        name: ccadmin
-        password: <%= common_password %>
-    databases:
-      - tag: cc
-        name: ccdb
-        citext: true
 
-  ccdb_ng: *ccdb
-
-  uaadb:
-    db_scheme: postgresql
-    address: 0.pgnfs.default.<%= deployment_name %>.microbosh
-    port: 5524
-    roles:
-      - tag: admin
-        name: uaaadmin
-        password: <%= common_password %>
-    databases:
-      - tag: uaa
-        name: uaadb
-        citext: true
-
-  cc_api_version: v2
-
-  cc: &cc
-    logging_level: debug
-    external_host: ccng
-    srv_api_uri: <%= protocol %>://api.<%= root_domain %>
-    cc_partition: default
-    db_encryption_key: <%= common_password %>
-    bootstrap_admin_email: "admin@local"
-    bulk_api_password: <%= common_password %>
-    uaa_resource_id: cloud_controller
-    staging_upload_user: upload
-    staging_upload_password: <%= common_password %>
-    resource_pool:
-      resource_directory_key: cf-att-io-cc-resources
-    packages:
-      app_package_directory_key: cf-att-io-cc-packages
-    droplets:
-      droplet_directory_key: cf-att-io-cc-droplets
-    default_quota_definition: runaway
-
-  ccng: *cc
-
-  login:
-    enabled: false
-
+# --------------------------------------------------------------------------------------------
+# properties.uaa 
+# See: https://github.com/cloudfoundry/cf-release/blob/master/jobs/uaa/spec#L24
+# --------------------------------------------------------------------------------------------
   uaa:
-    url: <%= protocol %>://uaa.<%= root_domain %>
-    no_ssl: <%= protocol == "http" %>
-    catalina_opts: -Xmx768m -XX:MaxPermSize=256m
-    resource_id: account_manager
+    enabled: true
+    port: 80
+    db_scheme: postgresql # Java
+    require_https: false
+    dump_requests: false
     jwt:
       signing_key: |
         -----BEGIN RSA PRIVATE KEY-----
@@ -277,30 +467,76 @@ properties:
         qHxf+ZH9BL1gk9Y6kCnbM5R60gfwjyW1/dQPjOzn9N394zd2FJoFHwdq9Qs0wBug
         spULZVNRxq7veq/fzwIDAQAB
         -----END PUBLIC KEY-----
-    cc:
-      client_secret: <%= common_password %>
-    admin:
-      client_secret: <%= common_password %>
+    url: (( "https://uaa." meta.root_domain ))
+    token:
+      url: (( "https://login." meta.root_domain "/oauth/token" ))
+    resource_id: account_manager
     batch:
-      username: batch
-      password: <%= common_password %>
+      username: uaabatchuser
+      password: (( meta.common_password ))
+    cc:
+      client_secret: (( meta.common_password ))
+    admin:
+      client_secret: (( meta.common_password ))
     client:
       autoapprove:
         - cf
+        - login
+        - styxclient
     clients:
+      # Required for the CF toolchain to access the UAA    
       cf:
+        id: cf
         override: true
         authorized-grant-types: password,implicit,refresh_token
         authorities: uaa.none
         scope: cloud_controller.read,cloud_controller.write,openid,password.write,cloud_controller.admin,scim.read,scim.write
         access-token-validity: 7200
         refresh-token-validity: 1209600
-      admin:
-        secret: <%= common_password %>
-        authorized-grant-types: client_credentials
-        authorities: clients.read,clients.write,clients.secret,password.write,scim.read,uaa.admin
+
+      # Required for the login server to get to the UAA
+      login:
+        id: login
+        override: true
+        autoapprove: true
+        scope: openid
+        authorities: oauth.login
+        authorized-grant-types: authorization_code,client_credentials,refresh_token
+        redirect-uri: (( "https://login." meta.root_domain ))
+        secret: (( meta.common_password ))
+
+      # This is ONLY for the styx gui
+      styxclient:
+         id: styxclient
+         secret: (( meta.common_password ))
+         override: true
+         authorized-grant-types: password,implicit,refresh_token,client_credentials
+         authorities: uaa.none
+         scope: cloud_controller.read,cloud_controller.write,openid,password.write,cloud_controller.admin,scim.read,scim.write
+         access-token-validity: 7200
+         refresh-token-validity: 1209600
+
+    # Internal user DB.
     scim:
+      # Enable the scim user repo - properties.uaa.scim.userids_enabled (see line 91 of the template file) 
       userids_enabled: true
       users:
-      - admin|<%= common_password %>|scim.write,scim.read,openid,cloud_controller.admin,uaa.admin,password.write
-      - services|<%= common_password %>|scim.write,scim.read,openid,cloud_controller.admin
+      - (( "admin|" meta.common_password "|scim.write,scim.read,openid,cloud_controller.admin" ))
+      - (( "services|" meta.common_password "|scim.write,scim.read,openid,cloud_controller.admin" ))
+
+  # --------------------------------------------------------------------------------------------
+  # properties.adminUI
+  # See: https://github.com/cloudfoundry-community/admin-ui-boshrelease/blob/master/jobs/admin_ui/spec
+  # --------------------------------------------------------------------------------------------
+  admin_ui:
+    cloud_controller_uri: (( "https://api." meta.root_domain ))
+    uaa_admin_credentials:
+      username: admin
+      password: (( meta.common_password ))
+    ui_admin_credentials:
+      username: admin
+      password: (( meta.common_password ))
+    ui_credentials:
+      username: otherAdmin
+      password: (( meta.common_password ))
+    uri: (( "admin." meta.root_domain ))
