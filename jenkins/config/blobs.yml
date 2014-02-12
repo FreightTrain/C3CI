@@ -79,3 +79,8 @@ sqlite/sqlite-autoconf-3070500.tar.gz:
   sha: !binary |-
     NGUxMzM4NDk3YjhkYTUwYjg0MzA3MTkxYmIzNDE4ZTllYzU3MTVkNw==
   size: 1551070
+gcf/gcf-linux-amd64-12.2.14.tgz:
+  object_id: 30e5e0e2-1711-4e45-a2d9-58b1b3f12d68
+  sha: !binary |-
+    NmQ1ZTc0MDU1ZmE5ZjMzMDlkNTE5ZjQxMDM3ZDUwYWE5ZDE3YWJlMQ==
+  size: 3388453

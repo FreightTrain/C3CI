@@ -12,6 +12,7 @@ packages:
 - ruby
 - configure_jenkins
 - golang
+- gcf
 - spiff
 templates:
   bin/jenkins_master_ctl: bin/jenkins_master_ctl

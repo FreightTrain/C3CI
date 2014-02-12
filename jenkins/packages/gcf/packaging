@@ -1,0 +1,8 @@
+set -e -x
+
+tarball=gcf/gcf-linux-amd64-12.2.14.tgz
+
+tar -xvf ${tarball}
+
+cp -a cf ${BOSH_INSTALL_TARGET}/gcf
+chmod +x ${BOSH_INSTALL_TARGET}/gcf
