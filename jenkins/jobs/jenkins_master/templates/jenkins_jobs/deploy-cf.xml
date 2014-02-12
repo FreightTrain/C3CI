@@ -13,8 +13,8 @@
         </hudson.model.StringParameterDefinition>
         <hudson.model.StringParameterDefinition>
           <name>CF_MANIFEST</name>
-          <description>CF manifest name - eg. cf_ci_core.yml</description>
-          <defaultValue>cf_ci_core.yml</defaultValue>
+          <description>CF manifest name - eg. cf-154-core.yml</description>
+          <defaultValue>cf-154-core.yml</defaultValue>
         </hudson.model.StringParameterDefinition>
         <hudson.model.StringParameterDefinition>
           <name>STEMCELL_NAME</name>

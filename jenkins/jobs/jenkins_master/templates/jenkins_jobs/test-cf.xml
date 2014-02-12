@@ -48,7 +48,7 @@ gem install bundler -v 1.3.5
 source cf/nyet_ci.sh
 cd C3CI/nyet
 bundle
-bundle exec rspec spec/app_crud_spec.rb spec/support_spec/
+bundle exec rspec
 )</command>
     </hudson.tasks.Shell>
   </builders>
