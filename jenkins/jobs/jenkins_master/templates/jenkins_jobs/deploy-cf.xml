@@ -17,9 +17,9 @@
           <defaultValue>cf-154-core.yml</defaultValue>
         </hudson.model.StringParameterDefinition>
         <hudson.model.StringParameterDefinition>
-          <name>STEMCELL_NAME</name>
-          <description>Stemcell name - from official s3 buckets - eg. bosh-stemcell-1868-aws-xen-ubuntu.tgz</description>
-          <defaultValue>bosh-stemcell-1868-aws-xen-ubuntu.tgz</defaultValue>
+          <name>STEMCELL_URL</name>
+          <description>Stemcell url - from any http server (NOT HTTPS) accessible from Jenkins - eg. http://bosh-jenkins-artifacts.s3.amazonaws.com/bosh-stemcell/aws/bosh-stemcell-1975-aws-xen-ubuntu.tgz</description>
+          <defaultValue>http://bosh-jenkins-artifacts.s3.amazonaws.com/bosh-stemcell/aws/bosh-stemcell-1975-aws-xen-ubuntu.tgz</defaultValue>
         </hudson.model.StringParameterDefinition>
         <hudson.model.StringParameterDefinition>
           <name>SPIFF_DIR</name>
@@ -59,9 +59,7 @@
   <concurrentBuild>false</concurrentBuild>
   <builders>
     <hudson.tasks.Shell>
-      <command>
-
-RUBY_VERSION=$(ruby -v | awk &apos;{print $2}&apos;)
+      <command>RUBY_VERSION=$(ruby -v | awk &apos;{print $2}&apos;)
 export GEM_HOME=/var/vcap/store/gems/$RUBY_VERSION/$JOB_NAME
 export GEM_PATH=$GEM_HOME
 
@@ -77,7 +75,7 @@ bundle exec rake cf:upload_and_deploy_release[\
 `pwd`/../cf/${CF_MANIFEST},\
 https://${BOSH_MICRO_IP}:25555,\
 `pwd`/cf-release,\
-http://bosh-jenkins-artifacts.s3.amazonaws.com/bosh-stemcell/aws/${STEMCELL_NAME},\
+${STEMCELL_URL},\
 `pwd`/../cf/aws\
 ]
 
