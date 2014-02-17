@@ -71,7 +71,7 @@ gem install bundler -v 1.3.5
 cd C3CI
 bundle
 bundle exec rake cf:upload_and_deploy_release[\
-`pwd`/cf-release/releases/cf-154.yml,\
+`pwd`/cf-release/releases/${CF_RELEASE},\
 `pwd`/../cf/${CF_MANIFEST},\
 https://${BOSH_MICRO_IP}:25555,\
 `pwd`/cf-release,\
