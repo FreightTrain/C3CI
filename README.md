@@ -20,3 +20,10 @@ BOSH mediator is invoked through a rake task, which takes the following argument
 * stemcell_resource_uri - URL to the stemcell
 * username - (Optional) BOSH director username, default 'admin'
 * password - (Optional) BOSH director password, default 'admin'
+
+
+## Git Submodules and CF-Release
+
+The Jenkins jobs are configured to use cf releases from the cf-release git submodule.
+If new releases are needed from upstream, the git-release (and matching nyet test repo) should be bumped.
+
