@@ -1,0 +1,12 @@
+---
+name: redis
+
+# Job specific files which are copied to the jobs directory on the target machine
+# Eg config or startup files for Redis which ar not packaged with the software by default
+templates:
+  bin/redis_ctl.sh: bin/redis_ctl.sh
+
+# References to existing packages that will be deployed to compose this job
+# Each package is deployed to a folder undr /var/vcap/packages/version
+packages:
+- redis

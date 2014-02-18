@@ -1,0 +1,8 @@
+---
+final_name: redis
+min_cli_version: 0.1
+blobstore:
+  provider: s3
+  options:
+    host: s3-eu-west-1.amazonaws.com
+    bucket_name: c3ci-blobstore
