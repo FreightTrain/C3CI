@@ -4,9 +4,9 @@ require 'yaml'
 module BoshMediator
   class ManifestWriter
 
-    def initialize(manifest_file, stemcell_name_and_version, spiff_dir = nil)
+    def initialize(manifest_file, stemcell_release_info, spiff_dir = nil)
       @manifest_file = manifest_file
-      @stemcell_name_and_version = stemcell_name_and_version
+      @stemcell_release_info = stemcell_release_info
       @spiff_dir = spiff_dir
     end
 
@@ -34,14 +34,15 @@ module BoshMediator
     private
 
     def set_manifest_stemcell_and_version
-      unless [:name, :version].all?{|k| @stemcell_name_and_version[k]}
+      unless [:name, :version].all?{|k| @stemcell_release_info[k]}
         raise 'The provided stemcell name and version was malformed'
       end
       unless File.exists? @manifest_file
         raise "The provided release manifest - #{@manifest_file} - does not exist"
       end
-      sc_name = @stemcell_name_and_version[:name]
-      sc_version = @stemcell_name_and_version[:version]
+      sc_name = @stemcell_release_info[:name]
+      sc_version = @stemcell_release_info[:version]
+      cf_release = @stemcell_release_info[:release_version]
 
       puts "*** Updating stemcell name and version ***"
       puts "*** - on template manifest #{@manifest_file} ***"
@@ -49,7 +50,8 @@ module BoshMediator
       eruby = Erubis::Eruby.new(File.read(@manifest_file), :pattern=>'<!--% %-->')
       eruby.result(
         'stemcell_name' => sc_name,
-        'stemcell_version' => sc_version
+        'stemcell_version' => sc_version,
+        'cf_release' => cf_release
       )
     end
 

@@ -9,11 +9,14 @@ module BoshMediator
       bosh_director = Bosh::Cli::Client::Director.new(bosh_director_uri, username, password)
 
       deployment_command = Bosh::Cli::Command::Deployment.new
-      deployment_command.options = {:target => bosh_director_uri,
-                                    :username => username,
-                                    :password => password,
-                                    :non_interactive => true,
-                                    :force => true}
+      options = { :target => bosh_director_uri,
+                  :username => username,
+                  :password => password,
+                  :non_interactive => true,
+                  :force => true }
+
+      deployment_command.options = options
+      release_command.options = options.merge(:force => true, :with_tarball => true)
 
       BoshMediator.new(:director => bosh_director,
                        :release_command => release_command,

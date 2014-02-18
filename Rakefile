@@ -7,11 +7,12 @@ namespace :cf do
 
   desc 'Upload and deploy the release to the BOSH director'
   task :upload_and_deploy_release, [:release_file, :manifest_file, :director_url, :release_dir, :stemcell_resource_uri, :spiff_dir, :username, :password] do |_, args|
-    args.with_defaults(:username => 'admin', :password => 'admin')
+    args.with_defaults(:username => 'admin', :password => 'admin', :spiff_dir => nil)
 
     bosh_mediator = create_bosh_mediator(args[:director_url], args[:username], args[:password], args[:release_dir])
-    stemcell_name_and_version = stemcell_name_and_manifest(bosh_mediator, args)
-    manifest_file = BoshMediator::ManifestWriter.new(args[:manifest_file], stemcell_name_and_version, args[:spiff_dir]).parse_and_merge_file
+    stemcell_release_info = stemcell_name_and_manifest(bosh_mediator, args)
+    stemcell_release_info.merge!(:release_version => YAML.load_file(args[:release_file])['version'])
+    manifest_file = BoshMediator::ManifestWriter.new(args[:manifest_file], stemcell_release_info, args[:spiff_dir]).parse_and_merge_file
     bosh_mediator.set_manifest_file(manifest_file)
     bosh_mediator.upload_release(args[:release_file])
     bosh_mediator.deploy
