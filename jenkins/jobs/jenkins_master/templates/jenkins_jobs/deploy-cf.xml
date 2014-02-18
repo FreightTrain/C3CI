@@ -33,7 +33,7 @@
     <configVersion>2</configVersion>
     <userRemoteConfigs>
       <hudson.plugins.git.UserRemoteConfig>
-        <url>https://github.com/FreightTrain/C3CI-private.git</url>
+        <url>https://github.com/FreightTrain/C3CI-private</url>
       </hudson.plugins.git.UserRemoteConfig>
     </userRemoteConfigs>
     <branches>
@@ -59,10 +59,22 @@
   <concurrentBuild>false</concurrentBuild>
   <builders>
     <hudson.tasks.Shell>
-      <command>RUBY_VERSION=$(ruby -v | awk &apos;{print $2}&apos;)
+      <command>#!bash -e
+
+GITHUB_HASH=&quot;${GIT_URL}/tree/${GIT_COMMIT}&quot;
+GITHUB_SPIFF_URL=&quot;${GITHUB_HASH}/cf/${SPIFF_DIR}&quot;
+GITHUB_MANIFEST_URL=&quot;${GITHUB_HASH}/cf/${CF_MANIFEST}&quot;
+
+
+echo &quot;***********************&quot;
+export DESC=&quot;desc CF_RELEASE: ${CF_RELEASE} SPIFF_DIR: &lt;a href=&apos;${GITHUB_SPIFF_URL}&apos;&gt;SPIFF_URL&lt;/a&gt; CF_MANIFEST: &lt;a href=&apos;${GITHUB_MANIFEST_URL}&apos;&gt;GITHUB_MANIFEST_URL&lt;/a&gt; STEMCELL: &lt;a href=&apos;${STEMCELL_URL}&apos;&gt;STEMCELL&lt;/a&gt;&quot;
+echo $DESC
+echo &quot;DESC=$DESC&quot; &gt; tmp.var 
+echo &quot;***********************&quot;
+
+RUBY_VERSION=$(ruby -v | awk &apos;{print $2}&apos;)
 export GEM_HOME=/var/vcap/store/gems/$RUBY_VERSION/$JOB_NAME
 export GEM_PATH=$GEM_HOME
-
 export PATH=$PATH:$GEM_HOME/bin
 
 gem install bundler -v 1.3.5
@@ -71,7 +83,7 @@ gem install bundler -v 1.3.5
 cd C3CI
 bundle
 bundle exec rake cf:upload_and_deploy_release[\
-`pwd`/cf-release/releases/cf-154.yml,\
+`pwd`/cf-release/releases/${CF_RELEASE},\
 `pwd`/../cf/${CF_MANIFEST},\
 https://${BOSH_MICRO_IP}:25555,\
 `pwd`/cf-release,\
@@ -79,19 +91,31 @@ ${STEMCELL_URL},\
 `pwd`/../cf/aws\
 ]
 
-)
-</command>
+)</command>
     </hudson.tasks.Shell>
   </builders>
   <publishers>
-    <hudson.tasks.BuildTrigger>
-      <childProjects>test-cf</childProjects>
-      <threshold>
-        <name>SUCCESS</name>
-        <ordinal>0</ordinal>
-        <color>BLUE</color>
-      </threshold>
-    </hudson.tasks.BuildTrigger>
+    <hudson.plugins.descriptionsetter.DescriptionSetterPublisher plugin="description-setter@1.8">
+      <regexp>desc CF_RELEASE: (.*) SPIFF_DIR: (.*) CF_MANIFEST: (.*) STEMCELL: (.*)</regexp>
+      <regexpForFailed></regexpForFailed>
+      <description>\1 &lt;br&gt; \2 &lt;br&gt; \3 &lt;br&gt; \4</description>
+      <setForMatrix>false</setForMatrix>
+    </hudson.plugins.descriptionsetter.DescriptionSetterPublisher>
+    <hudson.plugins.parameterizedtrigger.BuildTrigger plugin="parameterized-trigger@2.22">
+      <configs>
+        <hudson.plugins.parameterizedtrigger.BuildTriggerConfig>
+          <configs>
+            <hudson.plugins.parameterizedtrigger.FileBuildParameters>
+              <propertiesFile>tmp.var</propertiesFile>
+              <failTriggerOnMissing>false</failTriggerOnMissing>
+            </hudson.plugins.parameterizedtrigger.FileBuildParameters>
+          </configs>
+          <projects>test-cf</projects>
+          <condition>SUCCESS</condition>
+          <triggerWithNoParameters>false</triggerWithNoParameters>
+        </hudson.plugins.parameterizedtrigger.BuildTriggerConfig>
+      </configs>
+    </hudson.plugins.parameterizedtrigger.BuildTrigger>
   </publishers>
   <buildWrappers/>
 </project>

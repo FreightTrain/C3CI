@@ -34,7 +34,11 @@
   <concurrentBuild>false</concurrentBuild>
   <builders>
     <hudson.tasks.Shell>
-      <command>#!bash -ex
+      <command>#!bash -e
+
+echo &quot;***********************&quot;
+echo &quot;${DESC}&quot;
+echo &quot;***********************&quot;
 
 RUBY_VERSION=$(ruby -v | awk &apos;{print $2}&apos;)
 export GEM_HOME=/var/vcap/store/gems/$RUBY_VERSION/$JOB_NAME
@@ -52,6 +56,13 @@ bundle exec rspec
 )</command>
     </hudson.tasks.Shell>
   </builders>
-  <publishers/>
+  <publishers>
+    <hudson.plugins.descriptionsetter.DescriptionSetterPublisher plugin="description-setter@1.8">
+      <regexp>desc CF_RELEASE: (.*) SPIFF_DIR: (.*) CF_MANIFEST: (.*) STEMCELL: (.*)</regexp>
+      <regexpForFailed></regexpForFailed>
+      <description>\1 &lt;br&gt; \2 &lt;br&gt; \3 &lt;br&gt; \4</description>
+      <setForMatrix>false</setForMatrix>
+    </hudson.plugins.descriptionsetter.DescriptionSetterPublisher>
+  </publishers>
   <buildWrappers/>
 </project>

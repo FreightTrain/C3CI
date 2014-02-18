@@ -1,5 +1,5 @@
 ---
-final_name: jenkins
+final_name: redis
 min_cli_version: 0.1
 blobstore:
   provider: s3

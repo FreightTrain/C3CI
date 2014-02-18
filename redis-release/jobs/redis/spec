@@ -1,0 +1,20 @@
+---
+name: redis
+
+# Job specific files which are copied to the jobs directory on the target machine
+# Eg config or startup files for Redis which ar not packaged with the software by default
+# Templating is automatically applied to .erb files listed below
+templates:
+  bin/redis_ctl.sh: bin/redis_ctl.sh
+  conf/redis.conf.erb: conf/redis.conf
+
+# References to existing packages that will be deployed to compose this job
+# Each package is deployed to a folder undr /var/vcap/packages/version
+packages:
+- redis
+
+# Properties used when applying erb templating.
+properties:
+  port:
+    default: "6379"
+    description: Port for the redis server to listen for connections
