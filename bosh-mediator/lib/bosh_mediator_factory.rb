@@ -16,10 +16,9 @@ module BoshMediator
                   :force => true }
 
       deployment_command.options = options
-      release_command.options = options.merge(:force => true, :with_tarball => true)
 
       BoshMediator.new(:director => bosh_director,
-                       :release_command => release_command,
+                       :release_command => release_command(options),
                        :deployment_command => deployment_command)
     end
 
@@ -37,10 +36,10 @@ module BoshMediator
       Dir.chdir(release_dir)
     end
 
-    def release_command
+    def release_command(options = {})
       release_command = Bosh::Cli::Command::Release.new
-      release_command.add_option(:force, true)
-      release_command.add_option(:with_tarball, true)
+      options.merge!(:force => true, :with_tarball => true)
+      release_command.options = options
       release_command
     end
 

@@ -14,7 +14,7 @@ module BoshMediator
       output_manifest = File.join(Dir.pwd, 'output-manifest.yml')
 
       Dir.mktmpdir do |dir|
-        parsed_erb = set_manifest_stemcell_and_version
+        parsed_erb = set_manifest_stemcell_release_info
         output_erb = File.join(dir, 'output-erb.yml')
 
         File.open(output_erb, 'w') do |f|
@@ -33,8 +33,8 @@ module BoshMediator
 
     private
 
-    def set_manifest_stemcell_and_version
-      unless [:name, :version].all?{|k| @stemcell_release_info[k]}
+    def set_manifest_stemcell_release_info
+      unless [:name, :version, :release_version].all?{|k| @stemcell_release_info[k]}
         raise 'The provided stemcell name and version was malformed'
       end
       unless File.exists? @manifest_file

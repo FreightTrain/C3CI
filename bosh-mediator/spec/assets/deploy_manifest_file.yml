@@ -13,9 +13,7 @@ stemcells:
 #===========================================================================
 releases:
 - name: cf
-  version: (( meta.cf_release ))
-- name: admin-ui
-  version: (( meta.admin_ui_release ))
+  version: <!--%= cf_release %-->
 
 # COMPILATION
 #===========================================================================
