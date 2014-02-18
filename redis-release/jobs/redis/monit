@@ -1,0 +1,5 @@
+check process redis-server
+  with pidfile /var/vcap/sys/run/redis/redis.pid
+  start program "/var/vcap/jobs/redis/bin/redis_ctl.sh start" with timeout 20 seconds
+  stop program "/var/vcap/jobs/redis/bin/redis_ctl.sh stop" with timeout 60 seconds
+  group vcap
