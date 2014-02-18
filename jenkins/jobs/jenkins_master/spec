@@ -36,6 +36,7 @@ templates:
 
   jenkins_jobs/deploy-cf.xml: jenkins_jobs/deploy-cf.xml
   jenkins_jobs/test-cf.xml: jenkins_jobs/test-cf.xml
+  jenkins_jobs/stemcell-smoke-test.xml: jenkins_jobs/stemcell-smoke-test.xml
 
 properties:
   jenkins.admin.password:
