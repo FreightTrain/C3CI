@@ -3,7 +3,17 @@
   <actions/>
   <description></description>
   <keepDependencies>false</keepDependencies>
-  <properties/>
+  <properties>
+    <hudson.model.ParametersDefinitionProperty>
+      <parameterDefinitions>
+        <hudson.model.StringParameterDefinition>
+          <name>NYET_ENV</name>
+          <description>The CF environment we want to run NYET tests on.</description>
+          <defaultValue>aws_nyet_ci.sh</defaultValue>
+        </hudson.model.StringParameterDefinition>
+      </parameterDefinitions>
+    </hudson.model.ParametersDefinitionProperty>
+  </properties>
   <scm class="hudson.plugins.git.GitSCM" plugin="git@2.0.1">
     <configVersion>2</configVersion>
     <userRemoteConfigs>
@@ -49,7 +59,7 @@ export PATH=$PATH:$GEM_HOME/bin
 gem install bundler -v 1.3.5
 
 (
-source cf/nyet_ci.sh
+source cf/${NYET_ENV}
 cd C3CI/nyet
 bundle
 bundle exec rspec
