@@ -8,8 +8,8 @@
       <parameterDefinitions>
         <hudson.model.StringParameterDefinition>
           <name>CF_RELEASE</name>
-          <description>CF release name - eg. cf-154.yml</description>
-          <defaultValue>cf-154.yml</defaultValue>
+          <description>CF release name - eg. cf-157.yml</description>
+          <defaultValue>cf-157.yml</defaultValue>
         </hudson.model.StringParameterDefinition>
         <hudson.model.StringParameterDefinition>
           <name>CF_MANIFEST</name>
