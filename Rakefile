@@ -18,6 +18,14 @@ namespace :cf do
     bosh_mediator.deploy
   end
 
+  desc 'Delete the deployment specified in the '
+  task :delete_deployment, [:director_url, :release_dir, :spiff_dir, :username, :password] do |_, args|
+    args.with_defaults(:username => 'admin', :password => 'admin', :spiff_dir => nil)
+    bosh_mediator = create_bosh_mediator(args[:director_url], args[:username], args[:password], args[:release_dir])
+    deployment_name = YAML.load_file(File.join(args[:spiff_dir], 'env.yml'))['meta']['name']
+    bosh_mediator.delete_deployment(deployment_name)
+  end
+
   private
 
   def stemcell_name_and_manifest(bosh_mediator, args)
