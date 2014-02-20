@@ -69,8 +69,9 @@ bundle exec rspec
   <publishers>
     <hudson.plugins.descriptionsetter.DescriptionSetterPublisher plugin="description-setter@1.8">
       <regexp>desc CF_RELEASE: (.*) SPIFF_DIR: (.*) CF_MANIFEST: (.*) STEMCELL: (.*)</regexp>
-      <regexpForFailed></regexpForFailed>
+      <regexpForFailed>desc CF_RELEASE: (.*) SPIFF_DIR: (.*) CF_MANIFEST: (.*) STEMCELL: (.*)</regexpForFailed>
       <description>\1 &lt;br&gt; \2 &lt;br&gt; \3 &lt;br&gt; \4</description>
+      <descriptionForFailed>\1 &lt;br&gt; \2 &lt;br&gt; \3 &lt;br&gt; \4</descriptionForFailed>
       <setForMatrix>false</setForMatrix>
     </hudson.plugins.descriptionsetter.DescriptionSetterPublisher>
   </publishers>

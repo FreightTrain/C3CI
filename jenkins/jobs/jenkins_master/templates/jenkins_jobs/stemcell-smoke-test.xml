@@ -80,8 +80,9 @@ ${STEMCELL_URL}\
   <publishers>
     <hudson.plugins.descriptionsetter.DescriptionSetterPublisher plugin="description-setter@1.8">
       <regexp>desc STEMCELL: (.*)</regexp>
-      <regexpForFailed></regexpForFailed>
+      <regexpForFailed>desc STEMCELL: (.*)</regexpForFailed>
       <description>\1</description>
+      <descriptionForFailed>\1</descriptionForFailed>
       <setForMatrix>false</setForMatrix>
     </hudson.plugins.descriptionsetter.DescriptionSetterPublisher>
   </publishers>

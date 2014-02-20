@@ -1,24 +1,27 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <project>
   <actions/>
-  <description></description>
+  <description>Deploy Cloud Foundry</description>
   <keepDependencies>false</keepDependencies>
   <properties>
     <hudson.model.ParametersDefinitionProperty>
       <parameterDefinitions>
         <hudson.model.StringParameterDefinition>
           <name>CF_RELEASE</name>
-          <description>CF release name - eg. cf-157.yml</description>
+          <description>The .yml file for the &lt;a href=&quot;https://github.com/cloudfoundry/cf-release/tree/master/releases&quot;&gt;CF release&lt;/a&gt; you want to deploy.&lt;br&gt;
+eg. cf-157.yml</description>
           <defaultValue>cf-157.yml</defaultValue>
         </hudson.model.StringParameterDefinition>
         <hudson.model.StringParameterDefinition>
           <name>CF_MANIFEST</name>
-          <description>CF manifest name - eg. cf-154-core.yml</description>
+          <description>Cloud Foundry BOSH Manifest&lt;br&gt;
+eg. cf-154-core.yml</description>
           <defaultValue>cf-154-core.yml</defaultValue>
         </hudson.model.StringParameterDefinition>
         <hudson.model.StringParameterDefinition>
           <name>STEMCELL_URL</name>
-          <description>Stemcell url - from any http server (NOT HTTPS) accessible from Jenkins - eg. http://bosh-jenkins-artifacts.s3.amazonaws.com/bosh-stemcell/aws/bosh-stemcell-1975-aws-xen-ubuntu.tgz</description>
+          <description>HTTP (NOT HTTPS) url to any BOSH Stemcell accessible to Jenkins. You way want to use a &lt;a href=&quot;http://bosh_artifacts.cfapps.io/file_collections?type=stemcells&quot;&gt;public Cloud Foundry Stemcell&lt;/a&gt;.
+&lt;br&gt;eg. http://bosh-jenkins-artifacts.s3.amazonaws.com/bosh-stemcell/aws/bosh-stemcell-1975-aws-xen-ubuntu.tgz</description>
           <defaultValue>http://bosh-jenkins-artifacts.s3.amazonaws.com/bosh-stemcell/aws/bosh-stemcell-1975-aws-xen-ubuntu.tgz</defaultValue>
         </hudson.model.StringParameterDefinition>
         <hudson.model.StringParameterDefinition>
@@ -61,13 +64,13 @@
     <hudson.tasks.Shell>
       <command>#!bash -e
 
+GITHUB_RELEASES_DIR=&quot;https://github.com/cloudfoundry/cf-release/blob/master/releases&quot;
 GITHUB_HASH=&quot;${GIT_URL}/tree/${GIT_COMMIT}&quot;
 GITHUB_SPIFF_URL=&quot;${GITHUB_HASH}/cf/${SPIFF_DIR}&quot;
 GITHUB_MANIFEST_URL=&quot;${GITHUB_HASH}/cf/${CF_MANIFEST}&quot;
 
-
 echo &quot;***********************&quot;
-export DESC=&quot;desc CF_RELEASE: ${CF_RELEASE} SPIFF_DIR: &lt;a href=&apos;${GITHUB_SPIFF_URL}&apos;&gt;SPIFF_URL&lt;/a&gt; CF_MANIFEST: &lt;a href=&apos;${GITHUB_MANIFEST_URL}&apos;&gt;GITHUB_MANIFEST_URL&lt;/a&gt; STEMCELL: &lt;a href=&apos;${STEMCELL_URL}&apos;&gt;STEMCELL&lt;/a&gt;&quot;
+export DESC=&quot;desc CF_RELEASE: &lt;a href=&apos;${GITHUB_RELEASES_DIR}/${CF_RELEASE}&apos;&gt;${CF_RELEASE}&lt;/a&gt; SPIFF_DIR: &lt;a href=&apos;${GITHUB_SPIFF_URL}&apos;&gt;${SPIFF_DIR}&lt;/a&gt; CF_MANIFEST: &lt;a href=&apos;${GITHUB_MANIFEST_URL}&apos;&gt;${CF_MANIFEST}&lt;/a&gt; STEMCELL: &lt;a href=&apos;${STEMCELL_URL}&apos;&gt;Stemcell&lt;/a&gt;&quot;
 echo $DESC
 echo &quot;DESC=$DESC&quot; &gt; tmp.var 
 echo &quot;***********************&quot;
@@ -97,8 +100,9 @@ ${STEMCELL_URL},\
   <publishers>
     <hudson.plugins.descriptionsetter.DescriptionSetterPublisher plugin="description-setter@1.8">
       <regexp>desc CF_RELEASE: (.*) SPIFF_DIR: (.*) CF_MANIFEST: (.*) STEMCELL: (.*)</regexp>
-      <regexpForFailed></regexpForFailed>
-      <description>\1 &lt;br&gt; \2 &lt;br&gt; \3 &lt;br&gt; \4</description>
+      <regexpForFailed>desc CF_RELEASE: (.*) SPIFF_DIR: (.*) CF_MANIFEST: (.*) STEMCELL: (.*)</regexpForFailed>
+      <description>CF release: \1&lt;br&gt;CF yaml: \3&lt;br&gt;Spiff yaml: \2&lt;br&gt; \4</description>
+      <descriptionForFailed>CF release: \1&lt;br&gt;CF yaml: \3&lt;br&gt;Spiff yaml: \2&lt;br&gt; \4</descriptionForFailed>
       <setForMatrix>false</setForMatrix>
     </hudson.plugins.descriptionsetter.DescriptionSetterPublisher>
     <hudson.plugins.parameterizedtrigger.BuildTrigger plugin="parameterized-trigger@2.22">
