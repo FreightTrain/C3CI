@@ -20,7 +20,7 @@ eg. cf-154-core.yml</description>
         </hudson.model.StringParameterDefinition>
         <hudson.model.StringParameterDefinition>
           <name>STEMCELL_URL</name>
-          <description>HTTP (NOT HTTPS) url to any BOSH Stemcell accessible to Jenkins. You way want to use a &lt;a href=&quot;http://bosh_artifacts.cfapps.io/file_collections?type=stemcells&quot;&gt;public Cloud Foundry Stemcell&lt;/a&gt;.
+          <description>HTTP (NOT HTTPS) url to any BOSH Stemcell accessible to Jenkins. You way want to use a &lt;a target=&quot;_blank&quot; href=&quot;http://bosh_artifacts.cfapps.io/file_collections?type=stemcells&quot;&gt;public Cloud Foundry Stemcell&lt;/a&gt;.
 &lt;br&gt;eg. http://bosh-jenkins-artifacts.s3.amazonaws.com/bosh-stemcell/aws/bosh-stemcell-1975-aws-xen-ubuntu.tgz</description>
           <defaultValue>http://bosh-jenkins-artifacts.s3.amazonaws.com/bosh-stemcell/aws/bosh-stemcell-1975-aws-xen-ubuntu.tgz</defaultValue>
         </hudson.model.StringParameterDefinition>
@@ -31,6 +31,9 @@ eg. cf-154-core.yml</description>
         </hudson.model.StringParameterDefinition>
       </parameterDefinitions>
     </hudson.model.ParametersDefinitionProperty>
+    <com.sonyericsson.rebuild.RebuildSettings plugin="rebuild@1.21">
+      <autoRebuild>false</autoRebuild>
+    </com.sonyericsson.rebuild.RebuildSettings>
   </properties>
   <scm class="hudson.plugins.git.GitSCM" plugin="git@2.0.1">
     <configVersion>2</configVersion>
@@ -99,10 +102,10 @@ ${STEMCELL_URL},\
   </builders>
   <publishers>
     <hudson.plugins.descriptionsetter.DescriptionSetterPublisher plugin="description-setter@1.8">
-      <regexp>desc CF_RELEASE: (.*) SPIFF_DIR: (.*) CF_MANIFEST: (.*) STEMCELL: (.*)</regexp>
-      <regexpForFailed>desc CF_RELEASE: (.*) SPIFF_DIR: (.*) CF_MANIFEST: (.*) STEMCELL: (.*)</regexpForFailed>
-      <description>CF release: \1&lt;br&gt;CF yaml: \3&lt;br&gt;Spiff yaml: \2&lt;br&gt; \4</description>
-      <descriptionForFailed>CF release: \1&lt;br&gt;CF yaml: \3&lt;br&gt;Spiff yaml: \2&lt;br&gt; \4</descriptionForFailed>
+      <regexp>desc  CF_RELEASE: (.*) SPIFF_DIR: (.*) CF_MANIFEST: (.*) STEMCELL: (.*)</regexp>
+      <regexpForFailed>desc  CF_RELEASE: (.*) SPIFF_DIR: (.*) CF_MANIFEST: (.*) STEMCELL: (.*)</regexpForFailed>
+      <description>&lt;small&gt;&lt;ul&gt;&lt;li&gt;\1&lt;/li&gt;&lt;li&gt;\2&lt;/li&gt;&lt;li&gt;\3&lt;/li&gt;&lt;li&gt;\4&lt;/li&gt;&lt;/ul&gt;&lt;/small&gt;</description>
+      <descriptionForFailed>&lt;small&gt;&lt;ul&gt;&lt;li&gt;\1&lt;/li&gt;&lt;li&gt;\2&lt;/li&gt;&lt;li&gt;\3&lt;/li&gt;&lt;li&gt;\4&lt;/li&gt;&lt;/ul&gt;&lt;/small&gt;</descriptionForFailed>
       <setForMatrix>false</setForMatrix>
     </hudson.plugins.descriptionsetter.DescriptionSetterPublisher>
     <hudson.plugins.parameterizedtrigger.BuildTrigger plugin="parameterized-trigger@2.22">
