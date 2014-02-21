@@ -1,23 +1,28 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <project>
   <actions/>
-  <description></description>
+  <description>Deploy a Redis VM as a Stemcell smoke test.&#xd;
+</description>
   <keepDependencies>false</keepDependencies>
   <properties>
     <hudson.model.ParametersDefinitionProperty>
       <parameterDefinitions>
         <hudson.model.StringParameterDefinition>
           <name>STEMCELL_URL</name>
-          <description>Stemcell url - from any http server (NOT HTTPS) accessible from Jenkins - eg. http://bosh-jenkins-artifacts.s3.amazonaws.com/bosh-stemcell/aws/bosh-stemcell-1975-aws-xen-ubuntu.tgz</description>
+          <description>HTTP (NOT HTTPS) url to any BOSH Stemcell accessible to Jenkins. You way want to use a &lt;a target=&quot;_blank&quot; href=&quot;http://bosh_artifacts.cfapps.io/file_collections?type=stemcells&quot;&gt;public Cloud Foundry Stemcell&lt;/a&gt;.
+&lt;br&gt;eg. http://bosh-jenkins-artifacts.s3.amazonaws.com/bosh-stemcell/aws/bosh-stemcell-1975-aws-xen-ubuntu.tgz</description>
           <defaultValue>http://bosh-jenkins-artifacts.s3.amazonaws.com/bosh-stemcell/aws/bosh-stemcell-1975-aws-xen-ubuntu.tgz</defaultValue>
         </hudson.model.StringParameterDefinition>
         <hudson.model.StringParameterDefinition>
-          <name>SMOKE_MANIFEST_FILE</name>
-          <description>Which manifest are we deploying as the smoke test</description>
-          <defaultValue>aws_redis.yml</defaultValue>
+          <name>SPIFF_DIR</name>
+          <description>Directory for the spiff environment file to use.</description>
+          <defaultValue>aws</defaultValue>
         </hudson.model.StringParameterDefinition>
       </parameterDefinitions>
     </hudson.model.ParametersDefinitionProperty>
+    <com.sonyericsson.rebuild.RebuildSettings plugin="rebuild@1.21">
+      <autoRebuild>false</autoRebuild>
+    </com.sonyericsson.rebuild.RebuildSettings>
   </properties>
   <scm class="hudson.plugins.git.GitSCM" plugin="git@2.0.1">
     <configVersion>2</configVersion>
@@ -51,38 +56,63 @@
     <hudson.tasks.Shell>
       <command>#!bash -e
 
-echo &quot;***********************&quot;
-export DESC=&quot;desc STEMCELL: &lt;a href=&apos;${STEMCELL_URL}&apos;&gt;STEMCELL&lt;/a&gt;&quot;
+GITHUB_HASH=&quot;${GIT_URL}/tree/${GIT_COMMIT}&quot;
+GITHUB_SPIFF_URL=&quot;${GITHUB_HASH}/cf/${SPIFF_DIR}&quot;
+
+echo &quot;**************************************&quot;
+echo &quot;Generating description for build&quot;
+echo &quot;**************************************&quot;
+export DESC=&quot;desc STEMCELL: &lt;a href=&apos;${STEMCELL_URL}&apos;&gt;Stemcell&lt;/a&gt; SPIFF_DIR: &lt;a target=&quot;_blank&quot; href=&quot;${GITHUB_SPIFF_URL}&quot;&gt;${SPIFF_DIR}&lt;/a&gt;&quot;
 echo $DESC
-echo &quot;***********************&quot;
+echo &quot;**************************************&quot;
 
 RUBY_VERSION=$(ruby -v | awk &apos;{print $2}&apos;)
 export GEM_HOME=/var/vcap/store/gems/$RUBY_VERSION/$JOB_NAME
 export GEM_PATH=$GEM_HOME
 export PATH=$PATH:$GEM_HOME/bin
-
 gem install bundler -v 1.3.5
 
 (
 cd C3CI
 bundle
-bundle exec rake cf:upload_and_deploy_release[\
-`pwd`/redis-release/releases/redis-1.yml,\
-`pwd`/../redis/${SMOKE_MANIFEST_FILE},\
-https://${BOSH_MICRO_IP}:25555,\
-`pwd`/redis-release,\
-${STEMCELL_URL}\
-]
 
-)</command>
+# Setup parameters
+ST_RELEASE_FILE=&quot;`pwd`/redis-release/releases/redis-1.yml&quot;
+ST_MANIFEST_FILE=&quot;`pwd`/../redis/redis-smoke-test-core.yml&quot;
+ST_DIRECTOR_URL=&quot;https://${BOSH_MICRO_IP}:25555&quot;
+ST_RELEASE_DIR=&quot;`pwd`/redis-release&quot;
+ST_STEMCELL=&quot;${STEMCELL_URL}&quot;
+ST_SPIFF_DIR=&quot;`pwd`/../redis/${SPIFF_DIR}&quot;
+
+echo &quot;**************************************&quot;
+echo &quot;Options being passed to bosh mediator:
+echo &quot;**************************************&quot;
+echo &quot;ST_RELEASE_FILE:  ${ST_RELEASE_FILE}&quot;
+echo &quot;ST_MANIFEST_FILE: ${ST_MANIFEST_FILE}&quot;
+echo &quot;ST_DIRECTOR_URL:  ${ST_DIRECTOR_URL}&quot;
+echo &quot;ST_RELEASE_DIR:   ${ST_RELEASE_DIR}&quot;
+echo &quot;ST_STEMCELL:      ${ST_STEMCELL}&quot;
+echo &quot;ST_SPIFF_DIR:     ${ST_SPIFF_DIR}&quot;
+echo &quot;**************************************&quot;
+
+bundle exec rake cf:upload_and_deploy_release[\
+${ST_RELEASE_FILE},\
+${ST_MANIFEST_FILE},\
+${ST_DIRECTOR_URL},\
+${ST_RELEASE_DIR},\
+${ST_STEMCELL},\
+${ST_SPIFF_DIR}\
+]
+)
+</command>
     </hudson.tasks.Shell>
   </builders>
   <publishers>
     <hudson.plugins.descriptionsetter.DescriptionSetterPublisher plugin="description-setter@1.8">
-      <regexp>desc STEMCELL: (.*)</regexp>
-      <regexpForFailed>desc STEMCELL: (.*)</regexpForFailed>
-      <description>\1</description>
-      <descriptionForFailed>\1</descriptionForFailed>
+      <regexp>desc STEMCELL: (.*) SPIFF_DIR: (.*)</regexp>
+      <regexpForFailed>desc STEMCELL: (.*) SPIFF_DIR: (.*)</regexpForFailed>
+      <description>&lt;small&gt;&lt;ul&gt;&lt;li&gt;\1&lt;/li&gt;&lt;li&gt;\2&lt;/li&gt;&lt;/ul&gt;&lt;/small&gt;</description>
+      <descriptionForFailed>&lt;small&gt;&lt;ul&gt;&lt;li&gt;\1&lt;/li&gt;&lt;li&gt;\2&lt;/li&gt;&lt;/ul&gt;&lt;/small&gt;</descriptionForFailed>
       <setForMatrix>false</setForMatrix>
     </hudson.plugins.descriptionsetter.DescriptionSetterPublisher>
   </publishers>
