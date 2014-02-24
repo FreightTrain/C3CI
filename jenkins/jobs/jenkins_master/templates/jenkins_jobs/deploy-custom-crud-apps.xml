@@ -1,0 +1,146 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<project>
+  <actions/>
+  <description></description>
+  <keepDependencies>false</keepDependencies>
+  <properties>
+    <hudson.model.ParametersDefinitionProperty>
+      <parameterDefinitions>
+        <hudson.model.StringParameterDefinition>
+          <name>NYET_ENV</name>
+          <description>The CF environment we want to deploy our apps into. This task will run AFTER verification of CF with nyet, so we&apos;re stealing those params.</description>
+          <defaultValue>aws_nyet_ci.sh</defaultValue>
+        </hudson.model.StringParameterDefinition>
+        <hudson.model.StringParameterDefinition>
+          <name>TEST_APP_REPO</name>
+          <description>The repo for the application we are going to deploy. Defaults to the spring-music example from CloudFoundry
+
+Git clone will use the current directory (which is a UUID based temp dir per-run) so no dir change is needed in the TEST_APP_BUILDSTEP</description>
+          <defaultValue>https://github.com/cloudfoundry-samples/spring-music.git</defaultValue>
+        </hudson.model.StringParameterDefinition>
+        <hudson.model.StringParameterDefinition>
+          <name>TEST_APP_BUILDSTEP</name>
+          <description>The build command used before pushing this application. Defaults to the build steps needed for spring music available at: https://github.com/cloudfoundry-samples/spring-music
+
+</description>
+          <defaultValue>./gradlew assemble</defaultValue>
+        </hudson.model.StringParameterDefinition>
+        <hudson.model.StringParameterDefinition>
+          <name>TEST_APP_STARTPATH</name>
+          <description>the -p option passed to the &apos;cf push&apos; command for locating a war (in the case of a java buildpack). 
+Defaults to the needed path for the spring-music app repo.</description>
+          <defaultValue>build/libs/build.war</defaultValue>
+        </hudson.model.StringParameterDefinition>
+      </parameterDefinitions>
+    </hudson.model.ParametersDefinitionProperty>
+    <com.sonyericsson.rebuild.RebuildSettings plugin="rebuild@1.21">
+      <autoRebuild>false</autoRebuild>
+    </com.sonyericsson.rebuild.RebuildSettings>
+  </properties>
+  <scm class="hudson.plugins.git.GitSCM" plugin="git@2.0.1">
+    <configVersion>2</configVersion>
+    <userRemoteConfigs>
+      <hudson.plugins.git.UserRemoteConfig>
+        <url>https://github.com/FreightTrain/C3CI-private</url>
+      </hudson.plugins.git.UserRemoteConfig>
+    </userRemoteConfigs>
+    <branches>
+      <hudson.plugins.git.BranchSpec>
+        <name>*/master</name>
+      </hudson.plugins.git.BranchSpec>
+    </branches>
+    <doGenerateSubmoduleConfigurations>false</doGenerateSubmoduleConfigurations>
+    <submoduleCfg class="list"/>
+    <extensions>
+      <hudson.plugins.git.extensions.impl.CleanCheckout/>
+      <hudson.plugins.git.extensions.impl.SubmoduleOption>
+        <disableSubmodules>false</disableSubmodules>
+        <recursiveSubmodules>true</recursiveSubmodules>
+      </hudson.plugins.git.extensions.impl.SubmoduleOption>
+    </extensions>
+  </scm>
+  <canRoam>true</canRoam>
+  <disabled>false</disabled>
+  <blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding>
+  <blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding>
+  <triggers class="vector"/>
+  <concurrentBuild>false</concurrentBuild>
+  <builders>
+    <hudson.tasks.Shell>
+      <command>#!bash -e
+
+GITHUB_HASH=&quot;${GIT_URL}/tree/${GIT_COMMIT}&quot;
+GITHUB_NYET_ENV_URL=&quot;${GITHUB_HASH}/cf/${NYET_ENV}&quot;
+
+echo &quot;***********************&quot;
+echo &quot;CUSTOM CRUD APPS TARGET: &lt;a href=&apos;${GITHUB_NYET_ENV_URL}&apos;&gt;${NYET_ENV}&lt;/a&gt;&quot;
+echo &quot;***********************&quot;
+echo &quot;${DESC}&quot; 
+echo &quot;***********************&quot;
+
+RUBY_VERSION=$(ruby -v | awk &apos;{print $2}&apos;)
+export GEM_HOME=/var/vcap/store/gems/$RUBY_VERSION/$JOB_NAME
+export GEM_PATH=$GEM_HOME
+
+export PATH=$PATH:$GEM_HOME/bin
+export APPTESTUUID=`date | md5sum | awk -F&quot; &quot; &apos;{print $1}&apos;`
+echo &quot;USING ${APPTESTUUID} for tmp directories and space name&quot;
+echo &quot;************************&quot;
+
+gem install bundler -v 1.3.5
+
+(
+source cf/${NYET_ENV}
+echo &quot;API Target: ${NYET_TARGET}&quot;
+mkdir ${APPTESTUUID}
+cd ${APPTESTUUID}
+
+echo &quot;Cloning REPO: ${TEST_APP_REPO}&quot;
+git clone ${TEST_APP_REPO} build
+
+echo &quot;***************&quot;
+echo &quot;***BUILDING***&quot;
+echo &quot;**************&quot;
+cd build
+${TEST_APP_BUILDSTEP}
+
+echo &quot;*************&quot;
+echo &quot;TARGETING CF  &quot;
+echo &quot;*************&quot;
+echo &quot;Removing existing manifest&quot;
+rm -fv manifest.yml
+
+gcf login -a ${NYET_TARGET} -u ${NYET_ADMIN_USERNAME} -p ${NYET_ADMIN_PASSWORD} -o demo
+echo &quot;CREATING SPACE ${APPTESTUUID}&quot;
+gcf create-space ${APPTESTUUID}
+gcf target -o demo -s ${APPTESTUUID}
+
+echo &quot;*************&quot;
+echo &quot;PUSHING APP  &quot;
+echo &quot;*************&quot;
+
+gcf push ${APPTESTUUID} -p ${TEST_APP_STARTPATH} -d `echo ${NYET_TARGET} | awk -F&quot;api.&quot; &apos;{print $2}&apos;` -m 1G 
+
+echo &quot;****************&quot;
+echo &quot;BASIC APP TEST   &quot;
+echo &quot;****************&quot;
+export APPDNSNAME=${APPTESTUUID}.`echo ${NYET_TARGET} | awk -F&quot;api.&quot; &apos;{print $2}&apos;`
+if [ &quot;\`wget http://${APPDNSNAME} -O /dev/null -S --quiet 2&gt;&amp;1 | grep &apos;200 OK&apos;\`&quot; != &quot;&quot; ]; 
+then 
+   echo &quot;WEB RESPONSE IS 200 OK!&quot; 
+   echo &quot;cleaning up...&quot;
+   gcf delete -f ${APPTESTUUID}
+   #gcf delete-space -f ${APPTESTUUID}
+   exit 0
+fi;
+
+echo &quot;WEB RESPONSE NOT 200! Check Deployment!!&quot;
+echo &quot;APP UUID: ${APPDNSNAME}&quot;
+exit 1
+
+)</command>
+    </hudson.tasks.Shell>
+  </builders>
+  <publishers/>
+  <buildWrappers/>
+</project>
