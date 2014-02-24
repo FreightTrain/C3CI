@@ -9,8 +9,8 @@
         <hudson.model.StringParameterDefinition>
           <name>CF_RELEASE</name>
           <description>The .yml file for the &lt;a href=&quot;https://github.com/cloudfoundry/cf-release/tree/master/releases&quot;&gt;CF release&lt;/a&gt; you want to deploy.&lt;br&gt;
-eg. cf-157.yml</description>
-          <defaultValue>cf-157.yml</defaultValue>
+eg. cf-159.yml</description>
+          <defaultValue>cf-159.yml</defaultValue>
         </hudson.model.StringParameterDefinition>
         <hudson.model.StringParameterDefinition>
           <name>CF_MANIFEST</name>
@@ -102,7 +102,7 @@ ${STEMCELL_URL},\
   </builders>
   <publishers>
     <hudson.plugins.descriptionsetter.DescriptionSetterPublisher plugin="description-setter@1.8">
-      <regexp>desc  CF_RELEASE: (.*) SPIFF_DIR: (.*) CF_MANIFEST: (.*) STEMCELL: (.*)</regexp>
+      <regexp>desc CF_RELEASE: (.*) SPIFF_DIR: (.*) CF_MANIFEST: (.*) STEMCELL: (.*)</regexp>
       <regexpForFailed>desc  CF_RELEASE: (.*) SPIFF_DIR: (.*) CF_MANIFEST: (.*) STEMCELL: (.*)</regexpForFailed>
       <description>&lt;small&gt;&lt;ul&gt;&lt;li&gt;\1&lt;/li&gt;&lt;li&gt;\2&lt;/li&gt;&lt;li&gt;\3&lt;/li&gt;&lt;li&gt;\4&lt;/li&gt;&lt;/ul&gt;&lt;/small&gt;</description>
       <descriptionForFailed>&lt;small&gt;&lt;ul&gt;&lt;li&gt;\1&lt;/li&gt;&lt;li&gt;\2&lt;/li&gt;&lt;li&gt;\3&lt;/li&gt;&lt;li&gt;\4&lt;/li&gt;&lt;/ul&gt;&lt;/small&gt;</descriptionForFailed>

@@ -85,7 +85,7 @@ ST_STEMCELL=&quot;${STEMCELL_URL}&quot;
 ST_SPIFF_DIR=&quot;`pwd`/../redis/${SPIFF_DIR}&quot;
 
 echo &quot;**************************************&quot;
-echo &quot;Options being passed to bosh mediator:
+echo &quot;Options being passed to bosh mediator:&quot;
 echo &quot;**************************************&quot;
 echo &quot;ST_RELEASE_FILE:  ${ST_RELEASE_FILE}&quot;
 echo &quot;ST_MANIFEST_FILE: ${ST_MANIFEST_FILE}&quot;
@@ -115,6 +115,18 @@ ${ST_SPIFF_DIR}\
       <descriptionForFailed>&lt;small&gt;&lt;ul&gt;&lt;li&gt;\1&lt;/li&gt;&lt;li&gt;\2&lt;/li&gt;&lt;/ul&gt;&lt;/small&gt;</descriptionForFailed>
       <setForMatrix>false</setForMatrix>
     </hudson.plugins.descriptionsetter.DescriptionSetterPublisher>
+    <hudson.plugins.parameterizedtrigger.BuildTrigger plugin="parameterized-trigger@2.22">
+      <configs>
+        <hudson.plugins.parameterizedtrigger.BuildTriggerConfig>
+          <configs>
+            <hudson.plugins.parameterizedtrigger.CurrentBuildParameters/>
+          </configs>
+          <projects>deploy-cf</projects>
+          <condition>SUCCESS</condition>
+          <triggerWithNoParameters>false</triggerWithNoParameters>
+        </hudson.plugins.parameterizedtrigger.BuildTriggerConfig>
+      </configs>
+    </hudson.plugins.parameterizedtrigger.BuildTrigger>
   </publishers>
   <buildWrappers/>
 </project>
