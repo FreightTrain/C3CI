@@ -56,7 +56,11 @@ module BoshMediator
     end
 
     def spiff_merge(erb_output_manifest, output_manifest)
-      files = ['networks.yml', 'env.yml'].map!{|f| File.join(@spiff_dir, f) }.join(' ')
+      files = ['networks.yml', 'env.yml'].map do |f| 
+        path = File.join(@spiff_dir, f)
+        path if File.exists?(path)
+      end.compact.join(' ')
+      
       puts "*** Merging in Spiff templates ***"
       puts "*** - from #{@spiff_dir} ***"
       puts "*** - to #{output_manifest} ***"
