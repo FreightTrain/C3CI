@@ -111,9 +111,11 @@ echo &quot;Removing existing manifest&quot;
 rm -fv manifest.yml
 
 gcf login -a ${NYET_TARGET} -u ${NYET_ADMIN_USERNAME} -p ${NYET_ADMIN_PASSWORD} -o demo
+echo &quot;CREATING ORG ${APPTESTUUID}&quot;
+gcf create-org ${APPTESTUUID}
 echo &quot;CREATING SPACE ${APPTESTUUID}&quot;
-gcf create-space ${APPTESTUUID}
-gcf target -o demo -s ${APPTESTUUID}
+gcf create-space ${APPTESTUUID} -o ${APPTESTUUID}
+gcf target -o ${APPTESTUUID} -s ${APPTESTUUID}
 
 echo &quot;*************&quot;
 echo &quot;PUSHING APP  &quot;
