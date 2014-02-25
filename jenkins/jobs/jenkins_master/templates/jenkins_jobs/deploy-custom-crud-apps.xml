@@ -73,9 +73,7 @@ GITHUB_HASH=&quot;${GIT_URL}/tree/${GIT_COMMIT}&quot;
 GITHUB_NYET_ENV_URL=&quot;${GITHUB_HASH}/cf/${NYET_ENV}&quot;
 
 echo &quot;***********************&quot;
-echo &quot;CUSTOM CRUD APPS TARGET: &lt;a href=&apos;${GITHUB_NYET_ENV_URL}&apos;&gt;${NYET_ENV}&lt;/a&gt;&quot;
-echo &quot;***********************&quot;
-echo &quot;${DESC}&quot; 
+echo &quot;desc NYET_ENV: &lt;a href=&apos;${GITHUB_NYET_ENV_URL}&apos;&gt;${NYET_ENV}&lt;/a&gt;&quot; 
 echo &quot;***********************&quot;
 
 RUBY_VERSION=$(ruby -v | awk &apos;{print $2}&apos;)
@@ -83,7 +81,7 @@ export GEM_HOME=/var/vcap/store/gems/$RUBY_VERSION/$JOB_NAME
 export GEM_PATH=$GEM_HOME
 
 export PATH=$PATH:$GEM_HOME/bin
-export APPTESTUUID=`date | md5sum | awk -F&quot; &quot; &apos;{print $1}&apos;`
+export APPTESTUUID=ci-crud-test-`date | md5sum | awk -F&quot; &quot; &apos;{print $1}&apos;`
 echo &quot;USING ${APPTESTUUID} for tmp directories and space name&quot;
 echo &quot;************************&quot;
 
@@ -143,6 +141,14 @@ exit 1
 )</command>
     </hudson.tasks.Shell>
   </builders>
-  <publishers/>
+  <publishers>
+    <hudson.plugins.descriptionsetter.DescriptionSetterPublisher plugin="description-setter@1.8">
+      <regexp>desc NYET_ENV: (.*)</regexp>
+      <regexpForFailed>desc NYET_ENV: (.*)</regexpForFailed>
+      <description>&lt;small&gt;&lt;ul&gt;&lt;li&gt;\1&lt;/li&gt;&lt;/ul&gt;&lt;/small&gt;</description>
+      <descriptionForFailed>&lt;small&gt;&lt;ul&gt;&lt;li&gt;\1&lt;/li&gt;&lt;/ul&gt;&lt;/small&gt;</descriptionForFailed>
+      <setForMatrix>false</setForMatrix>
+    </hudson.plugins.descriptionsetter.DescriptionSetterPublisher>
+  </publishers>
   <buildWrappers/>
 </project>
