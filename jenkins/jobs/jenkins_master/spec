@@ -21,7 +21,7 @@ templates:
   bin/nginx_ctl: bin/nginx_ctl
 
   bin/install_dependencies_ctl: bin/install_dependencies_ctl
-  bin/install_dependencies.sh: bin/install_dependencies.sh
+  bin/install_dependencies.sh.erb: bin/install_dependencies.sh
   data/properties.sh.erb: data/properties.sh
 
   helpers/ctl_setup.sh: helpers/ctl_setup.sh
@@ -56,6 +56,9 @@ properties:
   jenkins.plugins:
     description: Array of Jenkins plugins to install
     default: ['git']
+  os.packages:
+    description: Array of OS packages to install
+    default: ['']
   amazon.accesskey:
     description: Amazon API access key
   amazon.secretkey:

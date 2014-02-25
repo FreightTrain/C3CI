@@ -5,8 +5,10 @@ RUN_DIR=/var/vcap/sys/run/jenkins_master
 LOG_DIR=/var/vcap/sys/log/jenkins_master
 PIDFILE=$RUN_DIR/install_dependencies.pid
 
-# needed for rabbitmq to function properly
 export HOME=/root
+
+# List of packages, provided by BOSH manifest
+export PKG_TO_INSTALL="<%= p("os.packages").join(' ') %>"
 
 # function to test for a lock
 # expects the lock file as the first argument
@@ -39,19 +41,17 @@ f_lock_test ${PIDFILE}
 
 mkdir -p ${LOG_DIR}
 
+aptitude update
+
 while true
   do
-    if  dpkg -s graphviz > /dev/null
-      then true
-      else
-        aptitude update
-        aptitude install -y graphviz
-    fi
-    if  dpkg -s bzr > /dev/null
-      then true
-      else
-        aptitude update
-        aptitude install -y bzr
-    fi
+    for PKG in ${PKG_TO_INSTALL}
+      do
+        if  dpkg -s ${PKG} > /dev/null
+          then true
+          else
+            aptitude install -y ${PKG}
+        fi
+      done
   sleep 60
   done
