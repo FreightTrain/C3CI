@@ -70,9 +70,10 @@ eg. cf-154-core.yml</description>
 GITHUB_HASH=&quot;${GIT_URL}/tree/${GIT_COMMIT}&quot;
 GITHUB_SPIFF_URL=&quot;${GITHUB_HASH}/cf/${SPIFF_DIR}&quot;
 GITHUB_MANIFEST_URL=&quot;${GITHUB_HASH}/cf/${CF_MANIFEST}&quot;
+CF_RELEASE_VERSION=`echo ${CF_RELEASE} | awk -F &quot;/&quot; &apos;{print $NF}&apos;`
 
 echo &quot;***********************&quot;
-export DESC=&quot;desc CF_RELEASE: &lt;a href=&apos;${CF_RELEASE}&apos;&gt;&lt;/a&gt; SPIFF_DIR: &lt;a href=&apos;${GITHUB_SPIFF_URL}&apos;&gt;${SPIFF_DIR}&lt;/a&gt; CF_MANIFEST: &lt;a href=&apos;${GITHUB_MANIFEST_URL}&apos;&gt;${CF_MANIFEST}&lt;/a&gt; STEMCELL: &lt;a href=&apos;${STEMCELL_URL}&apos;&gt;Stemcell&lt;/a&gt;&quot;
+export DESC=&quot;desc CF_RELEASE: &lt;a href=&apos;${CF_RELEASE}&apos;&gt;${CF_RELEASE_VERSION}&lt;/a&gt; SPIFF_DIR: &lt;a href=&apos;${GITHUB_SPIFF_URL}&apos;&gt;${SPIFF_DIR}&lt;/a&gt; CF_MANIFEST: &lt;a href=&apos;${GITHUB_MANIFEST_URL}&apos;&gt;${CF_MANIFEST}&lt;/a&gt; STEMCELL: &lt;a href=&apos;${STEMCELL_URL}&apos;&gt;Stemcell&lt;/a&gt;&quot;
 echo $DESC
 echo &quot;DESC=$DESC&quot; &gt; tmp.var 
 echo &quot;***********************&quot;
