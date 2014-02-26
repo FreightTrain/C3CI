@@ -1,6 +1,3 @@
-[submodule "cf-release"]
-	path = cf-release
-	url = https://github.com/cloudfoundry/cf-release.git
 [submodule "nyet"]
 	path = nyet
 	url = https://github.com/cloudfoundry/nyet.git

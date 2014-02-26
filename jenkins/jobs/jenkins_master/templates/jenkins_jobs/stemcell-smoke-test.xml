@@ -9,7 +9,7 @@
       <parameterDefinitions>
         <hudson.model.StringParameterDefinition>
           <name>STEMCELL_URL</name>
-          <description>HTTP (NOT HTTPS) url to any BOSH Stemcell accessible to Jenkins. You way want to use a &lt;a target=&quot;_blank&quot; href=&quot;http://bosh_artifacts.cfapps.io/file_collections?type=stemcells&quot;&gt;public Cloud Foundry Stemcell&lt;/a&gt;.
+          <description>HTTP url to any BOSH Stemcell accessible to Jenkins. You way want to use a &lt;a target=&quot;_blank&quot; href=&quot;http://bosh_artifacts.cfapps.io/file_collections?type=stemcells&quot;&gt;public Cloud Foundry Stemcell&lt;/a&gt;.
 &lt;br&gt;eg. http://bosh-jenkins-artifacts.s3.amazonaws.com/bosh-stemcell/aws/bosh-stemcell-1975-aws-xen-ubuntu.tgz</description>
           <defaultValue>http://bosh-jenkins-artifacts.s3.amazonaws.com/bosh-stemcell/aws/bosh-stemcell-1975-aws-xen-ubuntu.tgz</defaultValue>
         </hudson.model.StringParameterDefinition>
@@ -90,7 +90,6 @@ echo &quot;**************************************&quot;
 echo &quot;ST_RELEASE_FILE:  ${ST_RELEASE_FILE}&quot;
 echo &quot;ST_MANIFEST_FILE: ${ST_MANIFEST_FILE}&quot;
 echo &quot;ST_DIRECTOR_URL:  ${ST_DIRECTOR_URL}&quot;
-echo &quot;ST_RELEASE_DIR:   ${ST_RELEASE_DIR}&quot;
 echo &quot;ST_STEMCELL:      ${ST_STEMCELL}&quot;
 echo &quot;ST_SPIFF_DIR:     ${ST_SPIFF_DIR}&quot;
 echo &quot;**************************************&quot;
@@ -99,7 +98,6 @@ bundle exec rake cf:upload_and_deploy_release[\
 ${ST_RELEASE_FILE},\
 ${ST_MANIFEST_FILE},\
 ${ST_DIRECTOR_URL},\
-${ST_RELEASE_DIR},\
 ${ST_STEMCELL},\
 ${ST_SPIFF_DIR}\
 ]

@@ -1,8 +1,9 @@
 require 'cli'
 require 'net/http'
+require_relative '../helpers/download_helper'
 
 module BoshMediator
-
+  
   class InvalidStemcellResourceError < StandardError
     def initialize(uri)
       super "The provided uri #{uri} does not point to a valid stemcell resource"
@@ -10,6 +11,7 @@ module BoshMediator
   end
 
   class StemcellResourceManager
+    include ::BoshMediator::DownloadHelper
 
     def download_stemcell(stemcell_url)
       file_name = URI.parse(stemcell_url).path.split("/").last
@@ -58,30 +60,6 @@ module BoshMediator
 
       Pathname.new(dir)
     end
-
-    def download_url(download_url, download_path, headers = {})
-      uri = URI.parse(download_url)
-      http = Net::HTTP.new(uri.host, uri.port)
-      http.request_get(uri.path, headers) do |resp|
-        case resp.code
-        when '304' then break # Do nothing, we already have the resource
-        when '200'
-          begin
-            f = File.open(download_path, 'wb')
-            resp.read_body do |segment|
-              f.write(segment)
-            end
-          ensure
-            f.close if f
-          end
-        else
-          raise "Problem downloading resource: #{download_url}"
-        end
-      end
-      puts download_path
-      download_path
-    end
-
   end
 
 end
