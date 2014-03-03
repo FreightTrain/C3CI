@@ -1,17 +1,4 @@
-manifests/*
-config/dev.yml
-config/private.yml
-releases/*.tgz
-dev_releases
-blobs
-.blobs
-.dev_builds
-.idea
-.final_builds/jobs/**/*.tgz
-.final_builds/packages/**/*.tgz
-*.swp
-*~
-*#
-#*
-.gitreview
-.cache
+# Ignore everything in this directory
+*
+# Except this file
+!.gitignore
