@@ -19,10 +19,21 @@ namespace :cf do
     manifest_file = BoshMediator::ManifestWriter.new(args[:manifest_file], stemcell_release_info, args[:spiff_dir]).parse_and_merge_file
     bosh_mediator.set_manifest_file(manifest_file)
     bosh_mediator.upload_release(release_file)
-    bosh_mediator.deploy
+
+    %w( SIGINT SIGTERM ).each do |signal|
+      trap(signal) do
+        puts "*** CAUGHT #{signal} task-id #{@task_id}! ***"
+        bosh_mediator.task_command.cancel(@task_id)
+        exit 1 
+      end
+    end
+
+    @status, @task_id = bosh_mediator.deploy
+    bosh_mediator.track_task(@task_id)
+    puts "*** Finished tracking TASK ID #{@task_id} ***"
   end
 
-  desc 'Delete the deployment specified in the '
+  desc 'Delete the deployment specified in the manifest'
   task :delete_deployment, [:director_url, :spiff_dir, :username, :password] do |_, args|
     args.with_defaults(:username => 'admin', :password => 'admin', :spiff_dir => nil)
     bosh_mediator = create_bosh_mediator(args[:director_url], args[:username], args[:password], Dir.pwd)

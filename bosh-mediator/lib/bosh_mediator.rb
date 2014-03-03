@@ -7,27 +7,33 @@ require_relative 'stemcell_resource_manager'
 module BoshMediator
   class BoshMediator
 
+    include Bosh::Cli::DeploymentHelper
     extend Forwardable
+
+    TaskFailedError = Class.new(StandardError)
 
     def_delegators :release_manager, :create_release, :upload_release, :upload_dev_release, :release_info, :set_dev_release_name, :find_dev_release
 
     attr_accessor :release_manager
     attr_accessor :stemcell_manager
+    attr_reader :deployment, :director, :task_command
 
     def initialize(options = {})
-      @bosh_director = options[:director]
+      @bosh_director = @director = options[:director]
       @release_command = options[:release_command]
       @deployment_command = options[:deployment_command]
       @release_manager = options[:release_manager] || ReleaseManager.new(options)
       @stemcell_manager = options[:stemcell_manager] || StemcellResourceManager.new
+      @task_command = options[:task_command]
       Bosh::Cli::Config.output = STDOUT
       Bosh::Cli::Config.interactive = false
       Bosh::Cli::Config.colorize = true
     end
 
     def deploy
-      @deployment_command.perform
-      BoshMediator.raise_on_error! @deployment_command
+      options = {:yaml => true, :resolve_properties => true}
+      payload = prepare_deployment_manifest(options)
+      status, task_id = process_director_return(@bosh_director.deploy(payload))
     end
 
     def delete_deployment(name)
@@ -60,6 +66,11 @@ module BoshMediator
 
     def set_manifest_file(manifest_file)
       @deployment_command.options.merge!(:config => manifest_file, :deployment => manifest_file)
+      @deployment = manifest_file
+    end
+
+    def track_task(task_id)
+      @task_command.track(task_id)
     end
 
     def self.raise_on_error!(bosh_cmd)
@@ -84,6 +95,16 @@ module BoshMediator
     def verify_and_upload_stemcell_to_director(stemcell_uri)
       @bosh_director.upload_stemcell(stemcell_uri)
       stemcell_manager.get_stemcell_name_and_version(stemcell_uri)
+    end
+
+    def deployment_required
+      true
+    end
+
+    def process_director_return(ret)
+      status, task_id = ret
+      raise TaskFailedError unless [:running, :done].include?(status)
+      [status, task_id]
     end
 
   end

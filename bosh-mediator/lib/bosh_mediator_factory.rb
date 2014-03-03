@@ -6,7 +6,7 @@ module BoshMediator
 
     def create_bosh_mediator(bosh_director_uri, username, password, release_dir)
       cd_to_release_dir!(release_dir)
-      bosh_director = Bosh::Cli::Client::Director.new(bosh_director_uri, username, password)
+      bosh_director = Bosh::Cli::Client::Director.new(bosh_director_uri, username, password, no_track: true)
 
       deployment_command = Bosh::Cli::Command::Deployment.new
       options = { :target => bosh_director_uri,
@@ -16,10 +16,14 @@ module BoshMediator
                   :force => true }
 
       deployment_command.options = options
+      
+      task_command = Bosh::Cli::Command::Task.new
+      task_command.options = options
 
       BoshMediator.new(:director => bosh_director,
                        :release_command => release_command(options),
-                       :deployment_command => deployment_command)
+                       :deployment_command => deployment_command,
+                       :task_command => task_command)
     end
 
     def create_local_bosh_mediator(release_dir)
