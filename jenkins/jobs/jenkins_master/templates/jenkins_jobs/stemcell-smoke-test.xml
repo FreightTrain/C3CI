@@ -16,7 +16,7 @@
         <hudson.model.StringParameterDefinition>
           <name>SPIFF_DIR</name>
           <description>Directory for the spiff environment file to use.</description>
-          <defaultValue>aws</defaultValue>
+          <defaultValue>aws-1</defaultValue>
         </hudson.model.StringParameterDefinition>
       </parameterDefinitions>
     </hudson.model.ParametersDefinitionProperty>
@@ -57,7 +57,7 @@
       <command>#!bash -e
 
 GITHUB_HASH=&quot;${GIT_URL}/tree/${GIT_COMMIT}&quot;
-GITHUB_SPIFF_URL=&quot;${GITHUB_HASH}/cf/${SPIFF_DIR}&quot;
+GITHUB_SPIFF_URL=&quot;${GITHUB_HASH}/infrastructures/${SPIFF_DIR}/redis&quot;
 
 echo &quot;**************************************&quot;
 echo &quot;Generating description for build&quot;
@@ -78,11 +78,11 @@ bundle
 
 # Setup parameters
 ST_RELEASE_FILE=&quot;`pwd`/redis-release/releases/redis-1.yml&quot;
-ST_MANIFEST_FILE=&quot;`pwd`/../redis/redis-smoke-test-core.yml&quot;
+ST_MANIFEST_FILE=&quot;`pwd`/../jobs/redis/redis-core.yml&quot;
 ST_DIRECTOR_URL=&quot;https://${BOSH_MICRO_IP}:25555&quot;
 ST_RELEASE_DIR=&quot;`pwd`/redis-release&quot;
 ST_STEMCELL=&quot;${STEMCELL_URL}&quot;
-ST_SPIFF_DIR=&quot;`pwd`/../redis/${SPIFF_DIR}&quot;
+ST_SPIFF_DIR=&quot;`pwd`/../infrastructures/${SPIFF_DIR}/redis&quot;
 
 echo &quot;**************************************&quot;
 echo &quot;Options being passed to bosh mediator:&quot;
