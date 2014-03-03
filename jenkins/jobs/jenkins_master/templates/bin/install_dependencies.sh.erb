@@ -53,5 +53,11 @@ while true
             aptitude install -y ${PKG}
         fi
       done
+    ## Allow passwordless sudo for vcap, for stemcell building
+    if grep -q 'vcap ALL=NOPASSWD: ALL' /etc/sudoers
+      then true
+    else
+      echo 'vcap ALL=NOPASSWD: ALL' >> /etc/sudoers
+    fi
   sleep 60
   done
