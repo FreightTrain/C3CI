@@ -9,7 +9,7 @@
         <hudson.model.StringParameterDefinition>
           <name>NYET_ENV</name>
           <description>The CF environment we want to deploy our apps into. This task will run AFTER verification of CF with nyet, so we&apos;re stealing those params.</description>
-          <defaultValue>aws_nyet_ci.sh</defaultValue>
+          <defaultValue>nyet_ci.sh</defaultValue>
         </hudson.model.StringParameterDefinition>
         <hudson.model.StringParameterDefinition>
           <name>TEST_APP_REPO</name>
@@ -30,6 +30,11 @@ Git clone will use the current directory (which is a UUID based temp dir per-run
           <description>the -p option passed to the &apos;cf push&apos; command for locating a war (in the case of a java buildpack). 
 Defaults to the needed path for the spring-music app repo.</description>
           <defaultValue>build/libs/build.war</defaultValue>
+        </hudson.model.StringParameterDefinition>
+        <hudson.model.StringParameterDefinition>
+          <name>SPIFF_DIR</name>
+          <description>Infrastructure-specific directory</description>
+          <defaultValue>aws-1</defaultValue>
         </hudson.model.StringParameterDefinition>
       </parameterDefinitions>
     </hudson.model.ParametersDefinitionProperty>
@@ -70,7 +75,7 @@ Defaults to the needed path for the spring-music app repo.</description>
       <command>#!bash -e
 
 GITHUB_HASH=&quot;${GIT_URL}/tree/${GIT_COMMIT}&quot;
-GITHUB_NYET_ENV_URL=&quot;${GITHUB_HASH}/cf/${NYET_ENV}&quot;
+GITHUB_NYET_ENV_URL=&quot;${GITHUB_HASH}/infrastructures/${SPIFF_DIR}/cf/${NYET_ENV}&quot;
 
 echo &quot;***********************&quot;
 echo &quot;CUSTOM CRUD APPS TARGET: &lt;a href=&apos;${GITHUB_NYET_ENV_URL}&apos;&gt;${NYET_ENV}&lt;/a&gt;&quot;
@@ -90,7 +95,7 @@ echo &quot;************************&quot;
 gem install bundler -v 1.3.5
 
 (
-source cf/${NYET_ENV}
+source infrastructures/${SPIFF_DIR}/cf/${NYET_ENV}
 echo &quot;API Target: ${NYET_TARGET}&quot;
 mkdir ${APPTESTUUID}
 cd ${APPTESTUUID}

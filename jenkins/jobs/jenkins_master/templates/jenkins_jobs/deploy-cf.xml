@@ -15,8 +15,8 @@ eg. https://raw.github.com/cloudfoundry/cf-release/master/releases/cf-159.yml</d
         <hudson.model.StringParameterDefinition>
           <name>CF_MANIFEST</name>
           <description>Cloud Foundry BOSH Manifest&lt;br&gt;
-eg. cf-154-core.yml</description>
-          <defaultValue>cf-154-core.yml</defaultValue>
+eg. cf-core.yml</description>
+          <defaultValue>cf-core.yml</defaultValue>
         </hudson.model.StringParameterDefinition>
         <hudson.model.StringParameterDefinition>
           <name>STEMCELL_URL</name>
@@ -27,7 +27,7 @@ eg. cf-154-core.yml</description>
         <hudson.model.StringParameterDefinition>
           <name>SPIFF_DIR</name>
           <description>Directory of files to merge with manifest, using spiff</description>
-          <defaultValue>aws</defaultValue>
+          <defaultValue>aws-1</defaultValue>
         </hudson.model.StringParameterDefinition>
       </parameterDefinitions>
     </hudson.model.ParametersDefinitionProperty>
@@ -68,8 +68,8 @@ eg. cf-154-core.yml</description>
       <command>#!bash -e
 
 GITHUB_HASH=&quot;${GIT_URL}/tree/${GIT_COMMIT}&quot;
-GITHUB_SPIFF_URL=&quot;${GITHUB_HASH}/cf/${SPIFF_DIR}&quot;
-GITHUB_MANIFEST_URL=&quot;${GITHUB_HASH}/cf/${CF_MANIFEST}&quot;
+GITHUB_SPIFF_URL=&quot;${GITHUB_HASH}/infrastructures/${SPIFF_DIR}/cf&quot;
+GITHUB_MANIFEST_URL=&quot;${GITHUB_HASH}/jobs/cf/${CF_MANIFEST}&quot;
 CF_RELEASE_VERSION=`echo ${CF_RELEASE} | awk -F &quot;/&quot; &apos;{print $NF}&apos;`
 
 echo &quot;***********************&quot;
@@ -90,10 +90,10 @@ cd C3CI
 bundle
 bundle exec rake cf:upload_and_deploy_release[\
 ${CF_RELEASE},\
-`pwd`/../cf/${CF_MANIFEST},\
+`pwd`/../jobs/cf/${CF_MANIFEST},\
 https://${BOSH_MICRO_IP}:25555,\
 ${STEMCELL_URL},\
-`pwd`/../cf/${SPIFF_DIR}\
+`pwd`/../infrastructures/${SPIFF_DIR}/cf\
 ]
 
 )</command>
@@ -115,6 +115,7 @@ ${STEMCELL_URL},\
               <propertiesFile>tmp.var</propertiesFile>
               <failTriggerOnMissing>false</failTriggerOnMissing>
             </hudson.plugins.parameterizedtrigger.FileBuildParameters>
+            <hudson.plugins.parameterizedtrigger.CurrentBuildParameters/>
           </configs>
           <projects>test-cf</projects>
           <condition>SUCCESS</condition>
