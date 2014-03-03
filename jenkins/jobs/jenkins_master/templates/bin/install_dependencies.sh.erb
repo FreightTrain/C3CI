@@ -59,5 +59,11 @@ while true
     else
       echo 'vcap ALL=NOPASSWD: ALL' >> /etc/sudoers
     fi
+    ## Install symlink for ovftool, necessary as stemcell build uses sudo
+    if test -L /usr/local/bin/ovftool
+      then true
+    else
+      ln -s /var/vcap/packages/ovftool/ovftool /usr/local/bin/ovftool
+    fi
   sleep 60
   done
