@@ -1,5 +1,6 @@
 #!/bin/bash
 
+echo "This script must be run in jobs/jenkins_master/templates/jenkins_jobs/"
 # This script retrieves Jenkins jobs configured on the server you specify
 # and turns them into templates for BOSH
 

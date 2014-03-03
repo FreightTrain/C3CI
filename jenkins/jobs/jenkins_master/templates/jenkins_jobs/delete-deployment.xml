@@ -9,7 +9,7 @@
         <hudson.model.StringParameterDefinition>
           <name>SPIFF_DIR</name>
           <description>Directory of files to merge with manifest, using spiff</description>
-          <defaultValue>aws</defaultValue>
+          <defaultValue>aws-1</defaultValue>
         </hudson.model.StringParameterDefinition>
       </parameterDefinitions>
     </hudson.model.ParametersDefinitionProperty>
@@ -50,7 +50,7 @@
       <command>#!bash -e
 
 GITHUB_HASH=&quot;${GIT_URL}/tree/${GIT_COMMIT}&quot;
-GITHUB_SPIFF_URL=&quot;${GITHUB_HASH}/cf/${SPIFF_DIR}&quot;
+GITHUB_SPIFF_URL=&quot;${GITHUB_HASH}/infrastructures/${SPIFF_DIR}/cf&quot;
 
 echo &quot;***********************&quot;
 export DESC=&quot;desc SPIFF_DIR: &lt;a href=&apos;${GITHUB_SPIFF_URL}&apos;&gt;SPIFF_URL&lt;/a&gt;&quot;
@@ -70,7 +70,7 @@ cd C3CI
 bundle
 bundle exec rake cf:delete_deployment[\
 https://${BOSH_MICRO_IP}:25555,\
-`pwd`/../cf/${SPIFF_DIR}\
+`pwd`/../infrastructures/${SPIFF_DIR}/cf\
 ]
 )</command>
     </hudson.tasks.Shell>
