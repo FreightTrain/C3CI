@@ -84,3 +84,8 @@ gcf/gcf-linux-amd64-12.2.14.tgz:
   sha: !binary |-
     NmQ1ZTc0MDU1ZmE5ZjMzMDlkNTE5ZjQxMDM3ZDUwYWE5ZDE3YWJlMQ==
   size: 3388453
+maven/apache-maven-3.2.1-bin.tar.gz:
+  object_id: 159eee23-2291-48bf-af0b-b9695abd182b
+  sha: !binary |-
+    NDBlMWJmMDc3NWZkM2ViY2FjMWRiZWI2MTE1M2I4NzFiODZiODk0Zg==
+  size: 6927918

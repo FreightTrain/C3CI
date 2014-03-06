@@ -1,0 +1,10 @@
+# Abort script on any command that exits with a non zero value
+set -e
+
+# Setup
+MAVEN_VERSION="apache-maven-3.2.1"
+MAVEN_TARBALL="${MAVEN_VERSION}-bin.tar.gz"
+
+# Package
+tar xzf maven/${MAVEN_TARBALL}
+cp -R ${MAVEN_VERSION}/* ${BOSH_INSTALL_TARGET}
