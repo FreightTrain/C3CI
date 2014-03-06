@@ -15,6 +15,7 @@ packages:
 - gcf
 - spiff
 - ovftool
+- maven
 templates:
   bin/jenkins_master_ctl: bin/jenkins_master_ctl
   bin/configure_jenkins_ctl: bin/configure_jenkins_ctl
