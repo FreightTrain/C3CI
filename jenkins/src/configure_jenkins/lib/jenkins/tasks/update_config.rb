@@ -19,6 +19,7 @@ module Jenkins
       def execute
         if config_version(existing_config_path) != config_version(src_config_path)
           copy_config_into_place
+          copy_maven_config_into_place
           restart_jenkins
         end
       end
@@ -39,6 +40,10 @@ module Jenkins
         FileUtils.cp src_config_path, existing_config_path
       end
 
+      def copy_maven_config_into_place
+        FileUtils.cp src_maven_config_path, existing_maven_config_path
+      end
+
       def src_config_path
         "#{@options[:job_dir]}/config/config.xml"
       end
@@ -46,6 +51,16 @@ module Jenkins
       def existing_config_path
         "#{@options[:store_dir]}/config.xml"
       end
+
+      def src_maven_config_path
+        "#{@options[:job_dir]}/config/hudson.tasks.Maven.xml"
+      end
+
+      def existing_maven_config_path
+        "#{@options[:store_dir]}/hudson.tasks.Maven.xml"
+      end
+
+      def restart_jenkins
 
       def restart_jenkins
         @options[:cli].run 'safe-restart'
