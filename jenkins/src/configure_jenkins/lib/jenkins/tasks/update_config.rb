@@ -61,8 +61,6 @@ module Jenkins
       end
 
       def restart_jenkins
-
-      def restart_jenkins
         @options[:cli].run 'safe-restart'
       end
 
