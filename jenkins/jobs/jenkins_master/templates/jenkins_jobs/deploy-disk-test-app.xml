@@ -8,27 +8,25 @@
       <parameterDefinitions>
         <hudson.model.StringParameterDefinition>
           <name>TEST_APP_REPO</name>
-          <description>The repo for the application we are going to deploy. Defaults to the spring-music example from CloudFoundry.&lt;br/&gt;
-Git clone will use the current directory (which is a UUID based temp dir per-run) so no dir change is needed in the TEST_APP_BUILDSTEP.</description>
-          <defaultValue>https://github.com/FreightTrain/spring-music.git</defaultValue>
+          <description>The repo for the application we are going to deploy. Defaults to the spring-music example from CloudFoundry
+Git clone will use the current directory (which is a UUID based temp dir per-run) so no dir change is needed in the TEST_APP_BUILDSTEP</description>
+          <defaultValue>https://github.com/FreightTrain/cf-test-app-disk-usage.git</defaultValue>
         </hudson.model.StringParameterDefinition>
         <hudson.model.StringParameterDefinition>
           <name>TEST_APP_BUILDSTEP</name>
-          <description>The build command used before pushing this application.&lt;br/&gt;
-Defaults to the build steps needed for spring music available at: &lt;a href=&quot;https://github.com/FreightTrain/spring-music&quot;&gt;https://github.com/FreightTrain/spring-music&lt;/a&gt;.
+          <description>The build command used before pushing this application.
 
 </description>
-          <defaultValue>./gradlew assemble</defaultValue>
+          <defaultValue>mvn clean package</defaultValue>
         </hudson.model.StringParameterDefinition>
         <hudson.model.StringParameterDefinition>
           <name>TEST_APP_STARTPATH</name>
-          <description>The -p option passed to the &apos;cf push&apos; command for locating a war (in the case of a java buildpack).&lt;br /&gt;
-Defaults to the needed path for the spring-music app repo.</description>
-          <defaultValue>build/libs/build.war</defaultValue>
+          <description>the -p option passed to the &apos;cf push&apos; command for locating a war (in the case of a java buildpack). </description>
+          <defaultValue>target/large-disk-test-java.war</defaultValue>
         </hudson.model.StringParameterDefinition>
         <hudson.model.StringParameterDefinition>
           <name>SPIFF_DIR</name>
-          <description>Infrastructure-specific directory.</description>
+          <description>Infrastructure-specific directory</description>
           <defaultValue>aws-1</defaultValue>
         </hudson.model.StringParameterDefinition>
       </parameterDefinitions>
@@ -78,9 +76,8 @@ echo &quot;***********************&quot;
 echo &quot;${DESC}&quot; 
 echo &quot;***********************&quot;
 
-APPTESTUUID=&quot;test-crud-app-`date | md5sum | awk -F&quot; &quot; &apos;{print $1}&apos;`&quot;
+APPTESTUUID=&quot;disk-test-app-`date | md5sum | awk -F&quot; &quot; &apos;{print $1}&apos;`&quot;
 echo &quot;USING ${APPTESTUUID} for tmp directories and space name&quot;
-echo &quot;************************&quot;
 
 source infrastructures/${SPIFF_DIR}/cf/nyet_ci.sh
 echo &quot;API Target: ${NYET_TARGET}&quot;
@@ -93,14 +90,17 @@ git clone ${TEST_APP_REPO} build
 echo &quot;***************&quot;
 echo &quot;***BUILDING***&quot;
 echo &quot;**************&quot;
+
 cd build
 ${TEST_APP_BUILDSTEP}
 
 echo &quot;*************&quot;
 echo &quot;TARGETING CF  &quot;
 echo &quot;*************&quot;
+
 echo &quot;Removing existing manifest&quot;
 rm -fv manifest.yml
+
 
 gcf --version
 
@@ -115,7 +115,7 @@ echo &quot;*************&quot;
 echo &quot;PUSHING APP  &quot;
 echo &quot;*************&quot;
 
-gcf push ${APPTESTUUID} -p ${TEST_APP_STARTPATH} -d `echo ${NYET_TARGET} | awk -F&quot;api.&quot; &apos;{print $2}&apos;` -m 1G 
+gcf push ${APPTESTUUID} -p ${TEST_APP_STARTPATH} -d `echo ${NYET_TARGET} | awk -F&quot;api.&quot; &apos;{print $2}&apos;` -m 2G 
 
 echo &quot;****************&quot;
 echo &quot;BASIC APP TEST   &quot;
@@ -123,17 +123,24 @@ echo &quot;****************&quot;
 export APPDNSNAME=${APPTESTUUID}.`echo ${NYET_TARGET} | awk -F&quot;api.&quot; &apos;{print $2}&apos;`
 if [ &quot;\`wget http://${APPDNSNAME} -O /dev/null -S --quiet 2&gt;&amp;1 | grep &apos;200 OK&apos;\`&quot; != &quot;&quot; ]; 
 then 
-   echo &quot;WEB RESPONSE IS 200 OK!&quot; 
-   echo &quot;cleaning up...&quot;
-   gcf delete -f ${APPTESTUUID}
-   #gcf delete-space -f ${APPTESTUUID}
-   exit 0
+   echo &quot;/ response 200 OK!&quot; 
+else
+   echo &quot;/ response not 200. Check Deployment!!&quot;
+   exit 1
 fi;
 
-echo &quot;WEB RESPONSE NOT 200! Check Deployment!!&quot;
-echo &quot;APP UUID: ${APPDNSNAME}&quot;
-exit 1
-</command>
+if [ &quot;\`wget http://${APPDNSNAME}/data -O /dev/null -S --quiet 2&gt;&amp;1 | grep &apos;200 OK&apos;\`&quot; != &quot;&quot; ]; 
+then 
+   echo &quot;/data response 200 OK!&quot; 
+else
+   echo &quot;/data response not 200. Check Deployment!!&quot;
+   exit 1
+fi;
+
+
+gcf delete -f ${APPTESTUUID}
+#gcf delete-space -f ${APPTESTUUID}
+exit 0</command>
     </hudson.tasks.Shell>
   </builders>
   <publishers/>

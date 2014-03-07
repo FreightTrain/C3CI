@@ -43,6 +43,7 @@ templates:
   jenkins_jobs/delete-deployment.xml: jenkins_jobs/delete-deployment.xml
   jenkins_jobs/deploy-custom-crud-apps.xml: jenkins_jobs/deploy-custom-crud-apps.xml
   jenkins_jobs/build-stemcell.xml: jenkins_jobs/build-stemcell.xml
+  jenkins_jobs/deploy-disk-test-app.xml: jenkins_jobs/deploy-disk-test-app.xml
 
 properties:
   jenkins.admin.password:
