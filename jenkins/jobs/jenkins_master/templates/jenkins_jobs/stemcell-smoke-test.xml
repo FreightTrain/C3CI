@@ -58,11 +58,12 @@ Ie: ${CONFIG_REPO}/infrastructures/${INFRASTRUCTURE_DIR}</description>
 
 GITHUB_HASH=&quot;${GIT_URL}/tree/${GIT_COMMIT}&quot;
 GITHUB_INF_DIR_URL=&quot;${GITHUB_HASH}/infrastructures/${JOB_INFRASTRUCTURE_DIR}/redis&quot;
+STEMCELL_DESC=`echo ${STEMCELL_URL} | sed &apos;s/.*\///&apos; | sed &apos;s/.tgz//&apos;`
 
 echo &quot;**************************************&quot;
 echo &quot;Generating description for build&quot;
 echo &quot;**************************************&quot;
-export DESC=&quot;desc STEMCELL: &lt;a href=&apos;${STEMCELL_URL}&apos;&gt;Stemcell&lt;/a&gt; JOB_INFRASTRUCTURE_DIR: &lt;a target=&quot;_blank&quot; href=&quot;${GITHUB_INF_DIR_URL}&quot;&gt;${JOB_INFRASTRUCTURE_DIR}&lt;/a&gt;&quot;
+export DESC=&quot;desc STEMCELL: &lt;a href=&apos;${STEMCELL_URL}&apos;&gt;${STEMCELL_DESC}&lt;/a&gt; JOB_INFRASTRUCTURE_DIR: &lt;a target=&quot;_blank&quot; href=&quot;${GITHUB_INF_DIR_URL}&quot;&gt;${JOB_INFRASTRUCTURE_DIR}&lt;/a&gt;&quot;
 echo $DESC
 echo &quot;**************************************&quot;
 

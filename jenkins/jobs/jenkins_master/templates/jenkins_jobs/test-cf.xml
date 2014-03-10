@@ -78,8 +78,8 @@ bundle exec rspec
     <hudson.plugins.descriptionsetter.DescriptionSetterPublisher plugin="description-setter@1.8">
       <regexp>desc CF_RELEASE: (.*) JOB_INFRASTRUCTURE_DIR: (.*) CF_MANIFEST: (.*) STEMCELL: (.*)</regexp>
       <regexpForFailed>desc  CF_RELEASE: (.*) JOB_INFRASTRUCTURE_DIR: (.*) CF_MANIFEST: (.*) STEMCELL: (.*)</regexpForFailed>
-      <description>&lt;small&gt;&lt;ul&gt;&lt;li&gt;\1&lt;/li&gt;&lt;li&gt;\2&lt;/li&gt;&lt;li&gt;\3&lt;/li&gt;&lt;li&gt;\4&lt;/li&gt;&lt;/ul&gt;&lt;/small&gt;</description>
-      <descriptionForFailed>&lt;small&gt;&lt;ul&gt;&lt;li&gt;\1&lt;/li&gt;&lt;li&gt;\2&lt;/li&gt;&lt;li&gt;\3&lt;/li&gt;&lt;li&gt;\4&lt;/li&gt;&lt;/ul&gt;&lt;/small&gt;</descriptionForFailed>
+      <description>&lt;small&gt;&lt;ul&gt;&lt;li&gt;\4&lt;/li&gt;&lt;li&gt;\2&lt;/li&gt;&lt;li&gt;\1&lt;/li&gt;&lt;li&gt;\3&lt;/li&gt;&lt;/ul&gt;&lt;/small&gt;</description>
+      <descriptionForFailed>&lt;small&gt;&lt;ul&gt;&lt;li&gt;\4&lt;/li&gt;&lt;li&gt;\2&lt;/li&gt;&lt;li&gt;\1&lt;/li&gt;&lt;li&gt;\3&lt;/li&gt;&lt;/ul&gt;&lt;/small&gt;</descriptionForFailed>
       <setForMatrix>false</setForMatrix>
     </hudson.plugins.descriptionsetter.DescriptionSetterPublisher>
     <hudson.plugins.parameterizedtrigger.BuildTrigger plugin="parameterized-trigger@2.22">
