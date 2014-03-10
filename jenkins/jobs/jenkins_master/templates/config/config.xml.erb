@@ -60,13 +60,19 @@
           <default>
             <comparator class="hudson.util.CaseInsensitiveComparator"/>
           </default>
-          <int>7</int>
+          <int>10</int>
           <string>AWS_ACCESS_ID</string>
           <string><%= p('amazon.accesskey') %></string>
           <string>AWS_SECRET_KEY</string>
           <string><%= p('amazon.secretkey') %></string>
           <string>BOSH_MICRO_IP</string>
           <string><%= p('bosh.micro_ip') %></string>
+          <string>CONFIG_REPO</string>
+          <string><%= p('jenkins_jobs.config_git_repository.giturl') %></string>
+          <string>CONFIG_REPO_BRANCH</string>
+          <string><%= p('jenkins_jobs.config_git_repository.branch') %></string>
+          <string>INFRASTRUCTURE_DIR</string>
+          <string><%= p('jenkins_jobs.infrastructure_directory') %></string>
           <string>LD_LIBRARY_PATH</string>
           <string>/var/vcap/packages/libfontconfig/lib/:/var/vcap/packages/libfreetype/lib/</string>
           <string>PATH</string>

@@ -61,6 +61,18 @@ downloadJenkinsConfig()
     replace  "<string>BOSH_MICRO_IP</string>.*\n[^<]*<string>[^<]*</string>" \
              "<string>BOSH_MICRO_IP</string>\n          <string><%= p('bosh.micro_ip') %></string>" \
              ${jenkinsConfigTemplate}
+
+    replace  "<string>CONFIG_REPO</string>.*\n[^<]*<string>[^<]*</string>" \
+             "<string>CONFIG_REPO</string>\n          <string><%= p('jenkins_jobs.config_git_repository.giturl') %></string>" \
+             ${jenkinsConfigTemplate}
+
+    replace  "<string>CONFIG_REPO_BRANCH</string>.*\n[^<]*<string>[^<]*</string>" \
+             "<string>CONFIG_REPO_BRANCH</string>\n          <string><%= p('jenkins_jobs.config_git_repository.branch') %></string>" \
+             ${jenkinsConfigTemplate}
+
+    replace  "<string>INFRASTRUCTURE_DIR</string>.*\n[^<]*<string>[^<]*</string>" \
+             "<string>INFRASTRUCTURE_DIR</string>\n          <string><%= p('jenkins_jobs.infrastructure_directory') %></string>" \
+             ${jenkinsConfigTemplate}
 }
 
 main()

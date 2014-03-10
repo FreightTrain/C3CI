@@ -7,6 +7,12 @@
     <hudson.model.ParametersDefinitionProperty>
       <parameterDefinitions>
         <hudson.model.StringParameterDefinition>
+          <name>JOB_INFRASTRUCTURE_DIR</name>
+          <description>Name of the infrastructure directory from which your &lt;a href=&quot;https://github.com/cloudfoundry/nyet#running-without-existing-organization&quot;&gt;NYET environment&lt;/a&gt; will be read.&lt;br&gt;
+Ie: ${CONFIG_REPO}/infrastructures/${INFRASTRUCTURE_DIR}/cf/nyet_ci.sh</description>
+          <defaultValue>${INFRASTRUCTURE_DIR}</defaultValue>
+        </hudson.model.StringParameterDefinition>
+        <hudson.model.StringParameterDefinition>
           <name>TEST_APP_REPO</name>
           <description>The repo for the application we are going to deploy. Defaults to the spring-music example from CloudFoundry
 Git clone will use the current directory (which is a UUID based temp dir per-run) so no dir change is needed in the TEST_APP_BUILDSTEP</description>
@@ -21,13 +27,8 @@ Git clone will use the current directory (which is a UUID based temp dir per-run
         </hudson.model.StringParameterDefinition>
         <hudson.model.StringParameterDefinition>
           <name>TEST_APP_STARTPATH</name>
-          <description>the -p option passed to the &apos;cf push&apos; command for locating a war (in the case of a java buildpack). </description>
+          <description>The -p option passed to the &apos;cf push&apos; command for locating a war (in the case of a java buildpack). </description>
           <defaultValue>target/large-disk-test-java.war</defaultValue>
-        </hudson.model.StringParameterDefinition>
-        <hudson.model.StringParameterDefinition>
-          <name>SPIFF_DIR</name>
-          <description>Infrastructure-specific directory</description>
-          <defaultValue>aws-1</defaultValue>
         </hudson.model.StringParameterDefinition>
       </parameterDefinitions>
     </hudson.model.ParametersDefinitionProperty>
@@ -67,8 +68,8 @@ Git clone will use the current directory (which is a UUID based temp dir per-run
     <hudson.tasks.Shell>
       <command>#!bash -e
 
-GITHUB_HASH=&quot;${GIT_URL}/tree/${GIT_COMMIT}&quot;
-GITHUB_NYET_ENV_URL=&quot;${GITHUB_HASH}/infrastructures/${SPIFF_DIR}/cf/nyet_ci.sh&quot;
+GITHUB_BASE_URL=&quot;${GIT_URL}/tree/${GIT_COMMIT}&quot;
+GITHUB_NYET_ENV_URL=&quot;${GITHUB_BASE_URL}/infrastructures/${JOB_INFRASTRUCTURE_DIR}/cf/nyet_ci.sh&quot;
 
 echo &quot;***********************&quot;
 echo &quot;CUSTOM CRUD APPS TARGET: &lt;a href=&apos;${GITHUB_NYET_ENV_URL}&apos;&gt;nyet_ci.sh&lt;/a&gt;&quot;
@@ -79,7 +80,7 @@ echo &quot;***********************&quot;
 APPTESTUUID=&quot;disk-test-app-`date | md5sum | awk -F&quot; &quot; &apos;{print $1}&apos;`&quot;
 echo &quot;USING ${APPTESTUUID} for tmp directories and space name&quot;
 
-source infrastructures/${SPIFF_DIR}/cf/nyet_ci.sh
+source infrastructures/${JOB_INFRASTRUCTURE_DIR}/cf/nyet_ci.sh
 echo &quot;API Target: ${NYET_TARGET}&quot;
 mkdir ${APPTESTUUID}
 cd ${APPTESTUUID}

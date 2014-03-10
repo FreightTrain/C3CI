@@ -72,3 +72,11 @@ properties:
     description: Amazon API secret key - obfuscated by Jenkins for storage
   bosh.micro_ip:
     description: BOSH micro for use by jenkins jobs
+  jenkins_jobs.config_git_repository.giturl:
+    description: Git URL from which to clone your C3CI config repository
+  jenkins_jobs.config_git_repository.branch:
+    description: Git branch from your config repository you want to be used
+    default: */master
+  jenkins_jobs.infrastructure_directory:
+    description: The infrastructure directory to use for deployments: [CONFIG_GIT_REPO_ROOT]/infrastructures/${jenkins_jobs.infrastructure_directory}
+    default: aws-1

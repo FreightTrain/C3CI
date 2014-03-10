@@ -7,27 +7,26 @@
     <hudson.model.ParametersDefinitionProperty>
       <parameterDefinitions>
         <hudson.model.StringParameterDefinition>
-          <name>CF_RELEASE</name>
-          <description>The .yml file for the &lt;a href=&quot;https://github.com/cloudfoundry/cf-release/tree/master/releases&quot;&gt;CF release&lt;/a&gt; you want to deploy.&lt;br&gt;
-eg. https://raw.github.com/cloudfoundry/cf-release/master/releases/cf-159.yml</description>
-          <defaultValue>https://raw.github.com/cloudfoundry/cf-release/master/releases/cf-159.yml</defaultValue>
-        </hudson.model.StringParameterDefinition>
-        <hudson.model.StringParameterDefinition>
           <name>CF_MANIFEST</name>
-          <description>Cloud Foundry BOSH Manifest&lt;br&gt;
-eg. cf-core.yml</description>
+          <description>Cloud Foundry BOSH Manifest.&lt;br&gt;
+Ie: ${CONFIG_REPO}/jobs/cf/${CF_MANIFEST}</description>
           <defaultValue>cf-core.yml</defaultValue>
         </hudson.model.StringParameterDefinition>
         <hudson.model.StringParameterDefinition>
-          <name>STEMCELL_URL</name>
-          <description>HTTP url to any BOSH Stemcell accessible to Jenkins. You way want to use a &lt;a target=&quot;_blank&quot; href=&quot;http://bosh_artifacts.cfapps.io/file_collections?type=stemcells&quot;&gt;public Cloud Foundry Stemcell&lt;/a&gt;.
-&lt;br&gt;eg. http://bosh-jenkins-artifacts.s3.amazonaws.com/bosh-stemcell/aws/bosh-stemcell-1975-aws-xen-ubuntu.tgz</description>
-          <defaultValue>http://bosh-jenkins-artifacts.s3.amazonaws.com/bosh-stemcell/aws/bosh-stemcell-1975-aws-xen-ubuntu.tgz</defaultValue>
+          <name>JOB_INFRASTRUCTURE_DIR</name>
+          <description>Name of the infrastructure directory from which your CF yaml fragments will be read.&lt;br&gt;
+Ie: ${CONFIG_REPO}/infrastructures/${INFRASTRUCTURE_DIR}</description>
+          <defaultValue>${INFRASTRUCTURE_DIR}</defaultValue>
         </hudson.model.StringParameterDefinition>
         <hudson.model.StringParameterDefinition>
-          <name>SPIFF_DIR</name>
-          <description>Directory of files to merge with manifest, using spiff</description>
-          <defaultValue>aws-1</defaultValue>
+          <name>CF_RELEASE</name>
+          <description>HTTP(S) url to any &lt;a href=&quot;https://github.com/cloudfoundry/cf-release/tree/master/releases&quot;&gt;CF release yaml file.&lt;/a&gt;</description>
+          <defaultValue>https://raw.github.com/cloudfoundry/cf-release/master/releases/cf-159.yml</defaultValue>
+        </hudson.model.StringParameterDefinition>
+        <hudson.model.StringParameterDefinition>
+          <name>STEMCELL_URL</name>
+          <description>HTTP(S) url to any &lt;a href=&quot;http://bosh_artifacts.cfapps.io/file_collections?type=stemcells&quot;&gt;BOSH Stemcell&lt;/a&gt; accessible to Jenkins.</description>
+          <defaultValue>http://bosh-jenkins-artifacts.s3.amazonaws.com/bosh-stemcell/aws/bosh-stemcell-1975-aws-xen-ubuntu.tgz</defaultValue>
         </hudson.model.StringParameterDefinition>
       </parameterDefinitions>
     </hudson.model.ParametersDefinitionProperty>
@@ -35,16 +34,16 @@ eg. cf-core.yml</description>
       <autoRebuild>false</autoRebuild>
     </com.sonyericsson.rebuild.RebuildSettings>
   </properties>
-  <scm class="hudson.plugins.git.GitSCM" plugin="git@2.0.1">
+  <scm class="hudson.plugins.git.GitSCM" plugin="git@2.0.3">
     <configVersion>2</configVersion>
     <userRemoteConfigs>
       <hudson.plugins.git.UserRemoteConfig>
-        <url>https://github.com/FreightTrain/C3CI-private</url>
+        <url>${CONFIG_REPO}</url>
       </hudson.plugins.git.UserRemoteConfig>
     </userRemoteConfigs>
     <branches>
       <hudson.plugins.git.BranchSpec>
-        <name>*/master</name>
+        <name>${CONFIG_REPO_BRANCH}</name>
       </hudson.plugins.git.BranchSpec>
     </branches>
     <doGenerateSubmoduleConfigurations>false</doGenerateSubmoduleConfigurations>
@@ -67,13 +66,13 @@ eg. cf-core.yml</description>
     <hudson.tasks.Shell>
       <command>#!bash -e
 
-GITHUB_HASH=&quot;${GIT_URL}/tree/${GIT_COMMIT}&quot;
-GITHUB_SPIFF_URL=&quot;${GITHUB_HASH}/infrastructures/${SPIFF_DIR}/cf&quot;
-GITHUB_MANIFEST_URL=&quot;${GITHUB_HASH}/jobs/cf/${CF_MANIFEST}&quot;
+GITHUB_BASE_URL=&quot;${GIT_URL}/tree/${GIT_COMMIT}&quot;
+GITHUB_INF_DIR_URL=&quot;${GITHUB_BASE_URL}/infrastructures/${JOB_INFRASTRUCTURE_DIR}/cf&quot;
+GITHUB_MANIFEST_URL=&quot;${GITHUB_BASE_URL}/jobs/cf/${CF_MANIFEST}&quot;
 CF_RELEASE_VERSION=`echo ${CF_RELEASE} | awk -F &quot;/&quot; &apos;{print $NF}&apos;`
 
 echo &quot;***********************&quot;
-export DESC=&quot;desc CF_RELEASE: &lt;a href=&apos;${CF_RELEASE}&apos;&gt;${CF_RELEASE_VERSION}&lt;/a&gt; SPIFF_DIR: &lt;a href=&apos;${GITHUB_SPIFF_URL}&apos;&gt;${SPIFF_DIR}&lt;/a&gt; CF_MANIFEST: &lt;a href=&apos;${GITHUB_MANIFEST_URL}&apos;&gt;${CF_MANIFEST}&lt;/a&gt; STEMCELL: &lt;a href=&apos;${STEMCELL_URL}&apos;&gt;Stemcell&lt;/a&gt;&quot;
+export DESC=&quot;desc CF_RELEASE: &lt;a href=&apos;${CF_RELEASE}&apos;&gt;${CF_RELEASE_VERSION}&lt;/a&gt; JOB_INFRASTRUCTURE_DIR: &lt;a href=&apos;${GITHUB_INF_DIR_URL}&apos;&gt;${JOB_INFRASTRUCTURE_DIR}&lt;/a&gt; CF_MANIFEST: &lt;a href=&apos;${GITHUB_MANIFEST_URL}&apos;&gt;${CF_MANIFEST}&lt;/a&gt; STEMCELL: &lt;a href=&apos;${STEMCELL_URL}&apos;&gt;Stemcell&lt;/a&gt;&quot;
 echo $DESC
 echo &quot;DESC=$DESC&quot; &gt; tmp.var 
 echo &quot;***********************&quot;
@@ -82,7 +81,6 @@ RUBY_VERSION=$(ruby -v | awk &apos;{print $2}&apos;)
 export GEM_HOME=/var/vcap/store/gems/$RUBY_VERSION/$JOB_NAME
 export GEM_PATH=$GEM_HOME
 export PATH=$PATH:$GEM_HOME/bin
-
 gem install bundler -v 1.3.5
 
 (
@@ -93,7 +91,7 @@ ${CF_RELEASE},\
 `pwd`/../jobs/cf/${CF_MANIFEST},\
 https://${BOSH_MICRO_IP}:25555,\
 ${STEMCELL_URL},\
-`pwd`/../infrastructures/${SPIFF_DIR}/cf\
+`pwd`/../infrastructures/${JOB_INFRASTRUCTURE_DIR}/cf\
 ]
 
 )</command>
@@ -101,8 +99,8 @@ ${STEMCELL_URL},\
   </builders>
   <publishers>
     <hudson.plugins.descriptionsetter.DescriptionSetterPublisher plugin="description-setter@1.8">
-      <regexp>desc CF_RELEASE: (.*) SPIFF_DIR: (.*) CF_MANIFEST: (.*) STEMCELL: (.*)</regexp>
-      <regexpForFailed>desc  CF_RELEASE: (.*) SPIFF_DIR: (.*) CF_MANIFEST: (.*) STEMCELL: (.*)</regexpForFailed>
+      <regexp>desc CF_RELEASE: (.*) JOB_INFRASTRUCTURE_DIR: (.*) CF_MANIFEST: (.*) STEMCELL: (.*)</regexp>
+      <regexpForFailed>desc  CF_RELEASE: (.*) JOB_INFRASTRUCTURE_DIR: (.*) CF_MANIFEST: (.*) STEMCELL: (.*)</regexpForFailed>
       <description>&lt;small&gt;&lt;ul&gt;&lt;li&gt;\1&lt;/li&gt;&lt;li&gt;\2&lt;/li&gt;&lt;li&gt;\3&lt;/li&gt;&lt;li&gt;\4&lt;/li&gt;&lt;/ul&gt;&lt;/small&gt;</description>
       <descriptionForFailed>&lt;small&gt;&lt;ul&gt;&lt;li&gt;\1&lt;/li&gt;&lt;li&gt;\2&lt;/li&gt;&lt;li&gt;\3&lt;/li&gt;&lt;li&gt;\4&lt;/li&gt;&lt;/ul&gt;&lt;/small&gt;</descriptionForFailed>
       <setForMatrix>false</setForMatrix>

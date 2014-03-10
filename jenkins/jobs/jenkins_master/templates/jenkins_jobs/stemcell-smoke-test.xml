@@ -9,14 +9,14 @@
       <parameterDefinitions>
         <hudson.model.StringParameterDefinition>
           <name>STEMCELL_URL</name>
-          <description>HTTP url to any BOSH Stemcell accessible to Jenkins. You way want to use a &lt;a target=&quot;_blank&quot; href=&quot;http://bosh_artifacts.cfapps.io/file_collections?type=stemcells&quot;&gt;public Cloud Foundry Stemcell&lt;/a&gt;.
-&lt;br&gt;eg. http://bosh-jenkins-artifacts.s3.amazonaws.com/bosh-stemcell/aws/bosh-stemcell-1975-aws-xen-ubuntu.tgz</description>
+          <description>HTTP(S) url to any &lt;a href=&quot;http://bosh_artifacts.cfapps.io/file_collections?type=stemcells&quot;&gt;BOSH Stemcell&lt;/a&gt; accessible to Jenkins.</description>
           <defaultValue>http://bosh-jenkins-artifacts.s3.amazonaws.com/bosh-stemcell/aws/bosh-stemcell-1975-aws-xen-ubuntu.tgz</defaultValue>
         </hudson.model.StringParameterDefinition>
         <hudson.model.StringParameterDefinition>
-          <name>SPIFF_DIR</name>
-          <description>Directory for the spiff environment file to use.</description>
-          <defaultValue>aws-1</defaultValue>
+          <name>JOB_INFRASTRUCTURE_DIR</name>
+          <description>Name of the infrastructure directory from which your smoke test yaml fragments will be read.&lt;br&gt;
+Ie: ${CONFIG_REPO}/infrastructures/${INFRASTRUCTURE_DIR}</description>
+          <defaultValue>${INFRASTRUCTURE_DIR}</defaultValue>
         </hudson.model.StringParameterDefinition>
       </parameterDefinitions>
     </hudson.model.ParametersDefinitionProperty>
@@ -28,12 +28,12 @@
     <configVersion>2</configVersion>
     <userRemoteConfigs>
       <hudson.plugins.git.UserRemoteConfig>
-        <url>https://github.com/FreightTrain/C3CI-private</url>
+        <url>${CONFIG_REPO}</url>
       </hudson.plugins.git.UserRemoteConfig>
     </userRemoteConfigs>
     <branches>
       <hudson.plugins.git.BranchSpec>
-        <name>*/master</name>
+        <name>${CONFIG_REPO_BRANCH}</name>
       </hudson.plugins.git.BranchSpec>
     </branches>
     <doGenerateSubmoduleConfigurations>false</doGenerateSubmoduleConfigurations>
@@ -57,12 +57,12 @@
       <command>#!bash -e
 
 GITHUB_HASH=&quot;${GIT_URL}/tree/${GIT_COMMIT}&quot;
-GITHUB_SPIFF_URL=&quot;${GITHUB_HASH}/infrastructures/${SPIFF_DIR}/redis&quot;
+GITHUB_INF_DIR_URL=&quot;${GITHUB_HASH}/infrastructures/${JOB_INFRASTRUCTURE_DIR}/redis&quot;
 
 echo &quot;**************************************&quot;
 echo &quot;Generating description for build&quot;
 echo &quot;**************************************&quot;
-export DESC=&quot;desc STEMCELL: &lt;a href=&apos;${STEMCELL_URL}&apos;&gt;Stemcell&lt;/a&gt; SPIFF_DIR: &lt;a target=&quot;_blank&quot; href=&quot;${GITHUB_SPIFF_URL}&quot;&gt;${SPIFF_DIR}&lt;/a&gt;&quot;
+export DESC=&quot;desc STEMCELL: &lt;a href=&apos;${STEMCELL_URL}&apos;&gt;Stemcell&lt;/a&gt; JOB_INFRASTRUCTURE_DIR: &lt;a target=&quot;_blank&quot; href=&quot;${GITHUB_INF_DIR_URL}&quot;&gt;${JOB_INFRASTRUCTURE_DIR}&lt;/a&gt;&quot;
 echo $DESC
 echo &quot;**************************************&quot;
 
@@ -82,7 +82,7 @@ ST_MANIFEST_FILE=&quot;`pwd`/../jobs/redis/redis-core.yml&quot;
 ST_DIRECTOR_URL=&quot;https://${BOSH_MICRO_IP}:25555&quot;
 ST_RELEASE_DIR=&quot;`pwd`/redis-release&quot;
 ST_STEMCELL=&quot;${STEMCELL_URL}&quot;
-ST_SPIFF_DIR=&quot;`pwd`/../infrastructures/${SPIFF_DIR}/redis&quot;
+ST_SPIFF_DIR=&quot;`pwd`/../infrastructures/${JOB_INFRASTRUCTURE_DIR}/redis&quot;
 
 echo &quot;**************************************&quot;
 echo &quot;Options being passed to bosh mediator:&quot;
@@ -107,8 +107,8 @@ ${ST_SPIFF_DIR}\
   </builders>
   <publishers>
     <hudson.plugins.descriptionsetter.DescriptionSetterPublisher plugin="description-setter@1.8">
-      <regexp>desc STEMCELL: (.*) SPIFF_DIR: (.*)</regexp>
-      <regexpForFailed>desc STEMCELL: (.*) SPIFF_DIR: (.*)</regexpForFailed>
+      <regexp>desc STEMCELL: (.*) JOB_INFRASTRUCTURE_DIR: (.*)</regexp>
+      <regexpForFailed>desc STEMCELL: (.*) JOB_INFRASTRUCTURE_DIR: (.*)</regexpForFailed>
       <description>&lt;small&gt;&lt;ul&gt;&lt;li&gt;\1&lt;/li&gt;&lt;li&gt;\2&lt;/li&gt;&lt;/ul&gt;&lt;/small&gt;</description>
       <descriptionForFailed>&lt;small&gt;&lt;ul&gt;&lt;li&gt;\1&lt;/li&gt;&lt;li&gt;\2&lt;/li&gt;&lt;/ul&gt;&lt;/small&gt;</descriptionForFailed>
       <setForMatrix>false</setForMatrix>

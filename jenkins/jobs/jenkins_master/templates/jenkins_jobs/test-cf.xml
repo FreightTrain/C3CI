@@ -7,14 +7,10 @@
     <hudson.model.ParametersDefinitionProperty>
       <parameterDefinitions>
         <hudson.model.StringParameterDefinition>
-          <name>NYET_ENV</name>
-          <description>Common NYET envi</description>
-          <defaultValue>nyet_ci.sh</defaultValue>
-        </hudson.model.StringParameterDefinition>
-        <hudson.model.StringParameterDefinition>
-          <name>SPIFF_DIR</name>
-          <description>Spiff DIR should be passed through from previous job.</description>
-          <defaultValue>aws-1</defaultValue>
+          <name>JOB_INFRASTRUCTURE_DIR</name>
+          <description>Name of the infrastructure directory from which your &lt;a href=&quot;https://github.com/cloudfoundry/nyet#running-without-existing-organization&quot;&gt;NYET environment&lt;/a&gt; will be read.&lt;br&gt;
+Ie: ${CONFIG_REPO}/infrastructures/${INFRASTRUCTURE_DIR}/cf/nyet_ci.sh</description>
+          <defaultValue>${INFRASTRUCTURE_DIR}</defaultValue>
         </hudson.model.StringParameterDefinition>
       </parameterDefinitions>
     </hudson.model.ParametersDefinitionProperty>
@@ -26,12 +22,12 @@
     <configVersion>2</configVersion>
     <userRemoteConfigs>
       <hudson.plugins.git.UserRemoteConfig>
-        <url>https://github.com/FreightTrain/C3CI-private</url>
+        <url>${CONFIG_REPO}</url>
       </hudson.plugins.git.UserRemoteConfig>
     </userRemoteConfigs>
     <branches>
       <hudson.plugins.git.BranchSpec>
-        <name>*/master</name>
+        <name>${CONFIG_REPO_BRANCH}</name>
       </hudson.plugins.git.BranchSpec>
     </branches>
     <doGenerateSubmoduleConfigurations>false</doGenerateSubmoduleConfigurations>
@@ -54,11 +50,11 @@
     <hudson.tasks.Shell>
       <command>#!bash -e
 
-GITHUB_HASH=&quot;${GIT_URL}/tree/${GIT_COMMIT}&quot;
-GITHUB_NYET_ENV_URL=&quot;${GITHUB_HASH}/infrastructures/${SPIFF_DIR}/cf/${NYET_ENV}&quot;
+GITHUB_BASE_URL=&quot;${GIT_URL}/tree/${GIT_COMMIT}&quot;
+GITHUB_NYET_ENV_URL=&quot;${GITHUB_BASE_URL}/infrastructures/${JOB_INFRASTRUCTURE_DIR}/cf/nyet_ci.sh&quot;
 
 echo &quot;***********************&quot;
-echo &quot;NYET TARGET: &lt;a href=&apos;${GITHUB_NYET_ENV_URL}&apos;&gt;${NYET_ENV}&lt;/a&gt;&quot;
+echo &quot;NYET TARGET: &lt;a href=&apos;${GITHUB_NYET_ENV_URL}&apos;&gt;nyet_ci.sh&lt;/a&gt;&quot;
 echo &quot;***********************&quot;
 echo &quot;${DESC}&quot; 
 echo &quot;***********************&quot;
@@ -66,13 +62,11 @@ echo &quot;***********************&quot;
 RUBY_VERSION=$(ruby -v | awk &apos;{print $2}&apos;)
 export GEM_HOME=/var/vcap/store/gems/$RUBY_VERSION/$JOB_NAME
 export GEM_PATH=$GEM_HOME
-
 export PATH=$PATH:$GEM_HOME/bin
-
 gem install bundler -v 1.3.5
 
 (
-source infrastructures/${SPIFF_DIR}/cf/${NYET_ENV}
+source infrastructures/${JOB_INFRASTRUCTURE_DIR}/cf/nyet_ci.sh
 echo &quot;NYET Target: ${NYET_TARGET}&quot;
 cd C3CI/nyet
 bundle
@@ -82,8 +76,8 @@ bundle exec rspec
   </builders>
   <publishers>
     <hudson.plugins.descriptionsetter.DescriptionSetterPublisher plugin="description-setter@1.8">
-      <regexp>desc CF_RELEASE: (.*) SPIFF_DIR: (.*) CF_MANIFEST: (.*) STEMCELL: (.*)</regexp>
-      <regexpForFailed>desc  CF_RELEASE: (.*) SPIFF_DIR: (.*) CF_MANIFEST: (.*) STEMCELL: (.*)</regexpForFailed>
+      <regexp>desc CF_RELEASE: (.*) JOB_INFRASTRUCTURE_DIR: (.*) CF_MANIFEST: (.*) STEMCELL: (.*)</regexp>
+      <regexpForFailed>desc  CF_RELEASE: (.*) JOB_INFRASTRUCTURE_DIR: (.*) CF_MANIFEST: (.*) STEMCELL: (.*)</regexpForFailed>
       <description>&lt;small&gt;&lt;ul&gt;&lt;li&gt;\1&lt;/li&gt;&lt;li&gt;\2&lt;/li&gt;&lt;li&gt;\3&lt;/li&gt;&lt;li&gt;\4&lt;/li&gt;&lt;/ul&gt;&lt;/small&gt;</description>
       <descriptionForFailed>&lt;small&gt;&lt;ul&gt;&lt;li&gt;\1&lt;/li&gt;&lt;li&gt;\2&lt;/li&gt;&lt;li&gt;\3&lt;/li&gt;&lt;li&gt;\4&lt;/li&gt;&lt;/ul&gt;&lt;/small&gt;</descriptionForFailed>
       <setForMatrix>false</setForMatrix>
