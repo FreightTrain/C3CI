@@ -1,3 +1,6 @@
 [submodule "nyet"]
 	path = nyet
 	url = https://github.com/cloudfoundry/nyet.git
+[submodule "jenkins"]
+	path = jenkins
+	url = https://github.com/FreightTrain/C3CI-jenkins.git
