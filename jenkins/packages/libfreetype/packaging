@@ -1,8 +1,0 @@
-#!/bin/bash
-set -e
-tar zxf libfreetype/freetype-2.5.0.1.tar.gz
-cd freetype-2.5.0.1
-env
-./configure --prefix=${BOSH_INSTALL_TARGET} --without-png
-make
-make install

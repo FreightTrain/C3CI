@@ -1,5 +1,0 @@
----
-name: maven
-
-files:
-- maven/apache-maven-3.2.1-bin.tar.gz

@@ -1,6 +1,0 @@
----
-name: phantomjs
-dependencies:
-- libfontconfig
-files:
-- phantomjs/phantomjs-1.9.2-linux-x86_64.tar.bz2

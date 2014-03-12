@@ -1,7 +1,0 @@
-#!/bin/bash
-set -e
-tar zxf libfontconfig/fontconfig-2.11.0.tar.gz
-cd fontconfig-2.11.0
-PKG_CONFIG_PATH=/var/vcap/packages/libfreetype/lib/pkgconfig ./configure --enable-libxml2 --prefix=${BOSH_INSTALL_TARGET}
-make
-make install
