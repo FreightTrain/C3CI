@@ -11,6 +11,8 @@ namespace :cf do
     args.with_defaults(:username => 'admin', :password => 'admin', :spiff_dir => nil)
 
     release_dir = Dir.pwd
+    puts Dir.pwd
+    puts release_dir
     release_file = local_release_file(args[:release_file], release_dir)
 
     bosh_mediator = create_bosh_mediator(args[:director_url], args[:username], args[:password], release_dir)
