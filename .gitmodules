@@ -4,3 +4,6 @@
 [submodule "jenkins"]
 	path = jenkins
 	url = https://github.com/FreightTrain/C3CI-jenkins.git
+[submodule "bosh-mediator"]
+	path = bosh-mediator
+	url = https://github.com/FreightTrain/bosh-mediator.git
