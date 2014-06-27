@@ -4,3 +4,6 @@
 [submodule "jenkins"]
 	path = jenkins
 	url = https://github.com/FreightTrain/C3CI-jenkins.git
+[submodule "cf-smoke-tests"]
+	path = cf-smoke-tests
+	url = https://github.com/cloudfoundry-incubator/cf-smoke-tests.git
