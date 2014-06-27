@@ -17,9 +17,9 @@ GEM
       bosh_cli
       bosh_common
       thor
-    bosh_cli (1.5.0.pre.1657)
-      blobstore_client (~> 1.5.0.pre.1657)
-      bosh_common (~> 1.5.0.pre.1657)
+    bosh_cli (1.2579.0)
+      blobstore_client (~> 1.2579.0)
+      bosh_common (~> 1.2579.0)
       highline (~> 1.6.2)
       httpclient (= 2.2.4)
       json_pure (~> 1.7)
@@ -30,7 +30,7 @@ GEM
       netaddr (~> 1.5.0)
       progressbar (~> 0.9.0)
       terminal-table (~> 1.4.3)
-    bosh_common (1.5.0.pre.1657)
+    bosh_common (1.2579.0)
     builder (3.2.2)
     erubis (2.7.0)
     excon (0.25.3)
@@ -77,6 +77,6 @@ PLATFORMS
 
 DEPENDENCIES
   bosh-gen (~> 0.12.0)
-  bosh_cli (~> 1.5.0.pre.1000)
+  bosh_cli (~> 1.2579)
   erubis (~> 2.7.0)
   rake (~> 10.1.0)
