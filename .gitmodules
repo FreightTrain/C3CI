@@ -9,4 +9,4 @@
 	url = https://github.com/cloudfoundry-incubator/cf-smoke-tests.git
 [submodule "bosh-mediator"]
 	path = bosh-mediator
-	url = https://github.com/FreightTrain/bosh-mediator.git
+	url = https://github.com/FreightTrain/bosh-mediator
